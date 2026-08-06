@@ -37,12 +37,13 @@
   .fx-bar{color:var(--muted);margin-bottom:.5rem;font-size:.75rem}
   .fx-bar span{color:#f59e0b}
   .xgrid{display:grid;grid-template-columns:36px repeat(5,1fr)}
-  .xc{padding:5px 7px;border:0.5px solid var(--border);color:var(--text)}
-  .xc.hdr{background:var(--surface2);color:var(--muted);text-align:center}
+  .xc{padding:5px 7px;border:0.5px solid var(--border);color:var(--text);cursor:cell;user-select:none;position:relative}
+  .xc.hdr{background:var(--surface2);color:var(--muted);text-align:center;user-select:none}
   .xc.num{color:var(--accent);text-align:right}
   .xc.formula{color:#f59e0b;text-align:right}
-  .xc.active{background:rgba(79,110,247,.12);border-color:var(--primary)}
+  .xc.active{background:rgba(79,110,247,.12);border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary);z-index:2}
   .xc.bold{font-weight:600}
+  .xc input{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--surface);border:none;color:var(--text);font-family:inherit;font-size:inherit;padding:5px 7px;outline:1px solid var(--primary);text-align:inherit;box-sizing:border-box;}
   .ai-insight{
     margin-top:.8rem;background:rgba(168,85,247,.08);
     border:0.5px solid rgba(168,85,247,.25);border-radius:8px;
@@ -61,36 +62,9 @@
     </div>
     <div class="tab-content">
       <div class="grid-wrap">
-        <div class="fx-bar">fx &nbsp;<span>=SUM(B2:B5)</span></div>
-        <div class="xgrid">
-          <div class="xc hdr"></div>
-          <div class="xc hdr">A</div><div class="xc hdr">B</div>
-          <div class="xc hdr">C</div><div class="xc hdr">D</div><div class="xc hdr">E</div>
-
-          <div class="xc hdr">1</div>
-          <div class="xc bold">Product</div><div class="xc bold">Sales</div>
-          <div class="xc bold">Cost</div><div class="xc bold">Profit</div><div class="xc bold">Margin</div>
-
-          <div class="xc hdr">2</div>
-          <div class="xc">Widget A</div><div class="xc num">42,300</div>
-          <div class="xc num">18,100</div><div class="xc num">24,200</div><div class="xc formula">57.2%</div>
-
-          <div class="xc hdr">3</div>
-          <div class="xc">Widget B</div><div class="xc num">31,800</div>
-          <div class="xc num">15,400</div><div class="xc num">16,400</div><div class="xc formula">51.6%</div>
-
-          <div class="xc hdr">4</div>
-          <div class="xc">Widget C</div><div class="xc num">58,100</div>
-          <div class="xc num">22,300</div><div class="xc num">35,800</div><div class="xc formula">61.6%</div>
-
-          <div class="xc hdr">5</div>
-          <div class="xc active">Widget D</div><div class="xc num active">19,500</div>
-          <div class="xc num">9,800</div><div class="xc num">9,700</div><div class="xc formula">49.7%</div>
-
-          <div class="xc hdr bold">Σ</div>
-          <div class="xc bold">Total</div><div class="xc formula bold">=SUM</div>
-          <div class="xc num" style="color:var(--muted)">65,600</div>
-          <div class="xc formula bold">=SUM</div><div class="xc formula bold">55.1%</div>
+        <div class="fx-bar">fx &nbsp;<span id="fx-val"></span></div>
+        <div class="xgrid" id="grid">
+          <!-- Dynamic Grid will be rendered here -->
         </div>
         <div class="ai-insight">
           <b>✦ AI Insight:</b>
@@ -99,5 +73,248 @@
       </div>
     </div>
   </div>
+
+<script>
+  const COLS = 5; // A to E
+  const ROWS = 6; // 1 to 6
+  
+  // Initial state mimicking the hardcoded grid
+  const state = {
+    'A1': { expr: 'Product', isBold: true },
+    'B1': { expr: 'Sales', isBold: true },
+    'C1': { expr: 'Cost', isBold: true },
+    'D1': { expr: 'Profit', isBold: true },
+    'E1': { expr: 'Margin', isBold: true },
+    
+    'A2': { expr: 'Widget A' },
+    'B2': { expr: '42300' },
+    'C2': { expr: '18100' },
+    'D2': { expr: '=B2-C2' },
+    'E2': { expr: '=D2/B2' },
+    
+    'A3': { expr: 'Widget B' },
+    'B3': { expr: '31800' },
+    'C3': { expr: '15400' },
+    'D3': { expr: '=B3-C3' },
+    'E3': { expr: '=D3/B3' },
+    
+    'A4': { expr: 'Widget C' },
+    'B4': { expr: '58100' },
+    'C4': { expr: '22300' },
+    'D4': { expr: '=B4-C4' },
+    'E4': { expr: '=D4/B4' },
+    
+    'A5': { expr: 'Widget D' },
+    'B5': { expr: '19500' },
+    'C5': { expr: '9800' },
+    'D5': { expr: '=B5-C5' },
+    'E5': { expr: '=D5/B5' },
+    
+    'A6': { expr: 'Total', isBold: true },
+    'B6': { expr: '=SUM(B2:B5)', isBold: true },
+    'C6': { expr: '=SUM(C2:C5)', isBold: true },
+    'D6': { expr: '=SUM(D2:D5)', isBold: true },
+    'E6': { expr: '=D6/B6', isBold: true }
+  };
+
+  const getColName = (idx) => String.fromCharCode(65 + idx);
+  let activeCell = null;
+  let isEditing = false;
+
+  function evaluate(expr) {
+    if (!expr) return '';
+    expr = String(expr).trim();
+    if (!expr.startsWith('=')) return expr;
+    
+    let formula = expr.substring(1).toUpperCase();
+    
+    // Handle SUM(A1:B2)
+    formula = formula.replace(/SUM\(([A-Z]+)(\d+):([A-Z]+)(\d+)\)/g, (match, c1, r1, c2, r2) => {
+      let sum = 0;
+      let startCol = c1.charCodeAt(0) - 65;
+      let endCol = c2.charCodeAt(0) - 65;
+      let startRow = parseInt(r1);
+      let endRow = parseInt(r2);
+      
+      for(let c = Math.min(startCol, endCol); c <= Math.max(startCol, endCol); c++) {
+        for(let r = Math.min(startRow, endRow); r <= Math.max(startRow, endRow); r++) {
+          let cellId = getColName(c) + r;
+          let val = parseFloat(getValue(cellId));
+          if(!isNaN(val)) sum += val;
+        }
+      }
+      return sum;
+    });
+
+    // Replace cell references with values
+    formula = formula.replace(/[A-Z]\d+/g, (match) => {
+      let val = getValue(match);
+      if(val === '' || val === null || isNaN(val)) return 0;
+      return parseFloat(val);
+    });
+
+    try {
+      // Basic math evaluation safely
+      if (/^[0-9+\-*/().\s]+$/.test(formula)) {
+        let result = new Function('return ' + formula)();
+        if(!isFinite(result) || isNaN(result)) return '#DIV/0!';
+        return result;
+      }
+      return '#ERROR';
+    } catch(e) {
+      return '#ERROR';
+    }
+  }
+
+  function getValue(cellId) {
+    if (!state[cellId]) return '';
+    return evaluate(state[cellId].expr);
+  }
+
+  function formatValue(val, cellId) {
+    if(typeof val === 'number') {
+      if(cellId && cellId.startsWith('E') && cellId !== 'E1') {
+        return (val * 100).toFixed(1) + '%';
+      }
+      return val.toLocaleString(undefined, {maximumFractionDigits: 2});
+    }
+    return val;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    
+    // Header Row
+    let html = '<div class="xc hdr"></div>';
+    for(let c = 0; c < COLS; c++) {
+      html += `<div class="xc hdr">${getColName(c)}</div>`;
+    }
+    grid.innerHTML += html;
+
+    // Data Rows
+    for(let r = 1; r <= ROWS; r++) {
+      let rowHtml = `<div class="xc hdr">${r === ROWS ? 'Σ' : r}</div>`;
+      for(let c = 0; c < COLS; c++) {
+        let cellId = `${getColName(c)}${r}`;
+        let cellData = state[cellId] || { expr: '' };
+        let val = getValue(cellId);
+        
+        let classes = ['xc'];
+        if(cellData.isBold) classes.push('bold');
+        if(typeof val === 'number') classes.push('num');
+        if(cellData.expr && String(cellData.expr).startsWith('=')) classes.push('formula');
+        if(activeCell === cellId) classes.push('active');
+        
+        let displayVal = formatValue(val, cellId);
+        
+        rowHtml += `<div class="${classes.join(' ')}" data-id="${cellId}" onclick="selectCell('${cellId}')" ondblclick="editCell('${cellId}')">`;
+        if (isEditing && activeCell === cellId) {
+          rowHtml += `<input type="text" id="edit-input" value="${(cellData.expr || '').replace(/"/g, '&quot;')}" onblur="finishEdit()" onkeydown="handleInputKey(event)">`;
+        } else {
+          rowHtml += displayVal;
+        }
+        rowHtml += `</div>`;
+      }
+      grid.innerHTML += rowHtml;
+    }
+    
+    // Update fx bar
+    const fxVal = document.getElementById('fx-val');
+    if (activeCell && state[activeCell]) {
+      fxVal.textContent = state[activeCell].expr || '';
+    } else {
+      fxVal.textContent = '';
+    }
+  }
+
+  function selectCell(cellId) {
+    if (isEditing && activeCell !== cellId) {
+      finishEdit();
+    }
+    activeCell = cellId;
+    isEditing = false;
+    renderGrid();
+  }
+
+  function editCell(cellId) {
+    activeCell = cellId;
+    isEditing = true;
+    renderGrid();
+    setTimeout(() => {
+      const input = document.getElementById('edit-input');
+      if(input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }, 0);
+  }
+
+  function finishEdit() {
+    if(!isEditing || !activeCell) return;
+    const input = document.getElementById('edit-input');
+    if(input) {
+      if(!state[activeCell]) state[activeCell] = {};
+      state[activeCell].expr = input.value;
+    }
+    isEditing = false;
+    renderGrid();
+  }
+
+  function handleInputKey(e) {
+    if(e.key === 'Enter') {
+      finishEdit();
+      moveSelection(1, 0); // Move down
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      finishEdit();
+      moveSelection(0, e.shiftKey ? -1 : 1); // Move right/left
+    } else if (e.key === 'Escape') {
+      isEditing = false;
+      renderGrid();
+    }
+  }
+  
+  function handleGlobalKey(e) {
+    if(isEditing || !activeCell) return;
+    
+    if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Tab'].includes(e.key)) {
+      e.preventDefault();
+    }
+
+    if(e.key === 'ArrowUp') moveSelection(-1, 0);
+    else if(e.key === 'ArrowDown' || e.key === 'Enter') moveSelection(1, 0);
+    else if(e.key === 'ArrowLeft') moveSelection(0, -1);
+    else if(e.key === 'ArrowRight' || e.key === 'Tab') moveSelection(0, 1);
+    else if(e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      editCell(activeCell);
+      setTimeout(() => {
+        const input = document.getElementById('edit-input');
+        if(input) input.value = e.key;
+      }, 10);
+    } else if (e.key === 'Backspace' || e.key === 'Delete') {
+      if(state[activeCell]) {
+        state[activeCell].expr = '';
+        renderGrid();
+      }
+    }
+  }
+
+  function moveSelection(dr, dc) {
+    if(!activeCell) return;
+    let col = activeCell.charCodeAt(0) - 65;
+    let row = parseInt(activeCell.substring(1));
+    
+    col = Math.max(0, Math.min(COLS - 1, col + dc));
+    row = Math.max(1, Math.min(ROWS, row + dr));
+    
+    selectCell(`${getColName(col)}${row}`);
+  }
+
+  document.addEventListener('keydown', handleGlobalKey);
+
+  // Initial render
+  selectCell('B2');
+</script>
 </body>
 </html>
