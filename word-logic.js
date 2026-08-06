@@ -1294,8 +1294,13 @@ function doShare() {
   const msg = document.getElementById('share-msg').value;
   const perm = document.getElementById('share-perm').value;
   if (!email) { toast('Please enter an email address'); return; }
+  
+  const subject = encodeURIComponent(`Document Shared with you: ${perm}`);
+  const body = encodeURIComponent(`Hello,\n\nI have shared a document with you.\nPermission: ${perm}\n\nMessage:\n${msg}\n\nClick the link to open the document: ${window.location.href}`);
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  
   closeDlg();
-  toast(`Document shared with ${email} (${perm}) ✓`);
+  toast(`Email client opened to share with ${email} (${perm}) ✓`);
 }
 
 function openSpellCheck() {

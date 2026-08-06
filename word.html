@@ -664,7 +664,7 @@ body.focus-mode #page-scroll-area{padding:40px;}
     <div class="dlg-row"><label>Share with:</label><input type="email" id="share-email" placeholder="Enter email address…"/></div>
     <div class="dlg-row"><label>Message:</label><textarea id="share-msg" rows="3" style="width:100%;border:1px solid #bbb;border-radius:3px;padding:6px;font-family:inherit;font-size:12px;" placeholder="Add a message…"></textarea></div>
     <div class="dlg-row"><label>Permission:</label>
-      <select id="share-perm" style="width:200px;"><option>Can edit</option><option>Can view</option><option>Can comment</option></select>
+      <select id="share-perm" style="width:200px;"><option selected>Can view</option><option>Can edit</option><option>Can comment</option></select>
     </div>
     <div class="dlg-row"><label><input type="checkbox" id="share-notify" checked/> Notify people</label></div>
   </div>
@@ -2523,8 +2523,13 @@ function doShare() {
   const msg = document.getElementById('share-msg').value;
   const perm = document.getElementById('share-perm').value;
   if (!email) { toast('Please enter an email address'); return; }
+  
+  const subject = encodeURIComponent(`Document Shared with you: ${perm}`);
+  const body = encodeURIComponent(`Hello,\n\nI have shared a document with you.\nPermission: ${perm}\n\nMessage:\n${msg}\n\nClick the link to open the document: ${window.location.href}`);
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  
   closeDlg();
-  toast(`Document shared with ${email} (${perm}) ✓`);
+  toast(`Email client opened to share with ${email} (${perm}) ✓`);
 }
 
 function openSpellCheck() {
