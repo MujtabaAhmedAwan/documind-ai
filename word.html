@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DocuMind - Word Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0e1a;
+    --surface:#111827;
+    --surface2:#1a2236;
+    --primary:#4F6EF7;
+    --accent:#00E5CC;
+    --text:#F0F4FF;
+    --muted:#7B8BB2;
+    --border:#1e2d4a;
+    --font:'Space Grotesk',sans-serif;
+    --mono:'JetBrains Mono',monospace
+  }
+  body{background:var(--bg);color:var(--text);font-family:var(--font);padding:2rem;line-height:1.6}
+  .app-preview{
+    background:var(--surface);border:0.5px solid var(--border);
+    border-radius:16px;overflow:hidden;
+    box-shadow:0 0 80px rgba(79,110,247,.08);
+    max-width: 800px; margin: 0 auto;
+  }
+  .app-bar{
+    background:var(--surface2);padding:.8rem 1rem;
+    display:flex;align-items:center;gap:.6rem;border-bottom:0.5px solid var(--border)
+  }
+  .traffic span{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:4px}
+  .traffic .r{background:#ff5f57}.traffic .y{background:#febc2e}.traffic .g{background:#28c840}
+  .tab-content{padding:1.2rem}
+  .doc-toolbar{display:flex;gap:3px;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
+  .tb-btn{background:transparent;border:none;color:var(--muted);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.8rem;font-family:var(--mono);transition:all .15s}
+  .tb-btn:hover{background:var(--surface2);color:var(--text)}
+  .tb-sep{width:.5px;background:var(--border);margin:0 3px;align-self:stretch}
+  .doc-content .doc-heading{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
+  .doc-content p{font-size:.87rem;line-height:1.7;color:var(--text);margin-bottom:.5rem}
+  .ai-suggest{
+    background:rgba(79,110,247,.08);border-left:2px solid var(--primary);
+    padding:.5rem .8rem;border-radius:0 6px 6px 0;margin-top:.5rem
+  }
+  .ai-tag{font-size:.7rem;background:rgba(79,110,247,.2);color:var(--primary);padding:1px 7px;border-radius:4px;font-family:var(--mono);margin-bottom:4px;display:inline-block}
+  .ai-suggest p{color:var(--primary);font-size:.82rem}
+</style>
+</head>
+<body>
+  <div class="app-preview">
+    <div class="app-bar">
+      <div class="traffic">
+        <span class="r"></span><span class="y"></span><span class="g"></span>
+      </div>
+      <div style="color: var(--muted); font-size: 0.8rem; margin-left: 1rem;">Document Editor</div>
+    </div>
+    <div class="tab-content">
+      <div class="doc-toolbar">
+        <button class="tb-btn" style="font-weight:700">B</button>
+        <button class="tb-btn" style="font-style:italic">I</button>
+        <button class="tb-btn" style="text-decoration:underline">U</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn">H1</button>
+        <button class="tb-btn">H2</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn">≡</button>
+        <button class="tb-btn">☰</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" style="color:#A855F7;font-size:.82rem">✦ AI</button>
+      </div>
+      <div class="doc-content">
+        <p class="doc-heading">Q3 Financial Report — 2024</p>
+        <p>This report outlines quarterly performance across all business units, with a breakdown of revenue streams and cost analysis for the period ending September 30, 2024.</p>
+        <p>Key highlights include a 23% increase in recurring revenue and operational efficiencies achieved through...</p>
+        <div class="ai-suggest">
+          <div class="ai-tag">✦ AI suggestion</div>
+          <p>...automation initiatives, resulting in a net margin improvement of 4.2 percentage points compared to Q2.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

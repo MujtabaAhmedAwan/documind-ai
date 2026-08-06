@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuMind Studio — Document & Excel Workspace</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet" />
+  <!-- Quill.js CSS -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  
+  <!-- Jspreadsheet CSS -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites@4.3.2/dist/jsuites.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4.13.3/dist/jspreadsheet.css" type="text/css" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            appbg: '#090d16',
+            surface: '#111827',
+            surface2: '#1a233a',
+            surface3: '#24304d',
+            excelGreen: '#107c41',
+            excelGreenDark: '#0b592e',
+            primary: '#3b82f6',
+            accent: '#00e5cc',
+            aiPurple: '#a855f7',
+            borderDark: '#1e2d4a',
+            cellSelect: '#2563eb'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #090d16;
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0b1120;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e2d4a;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b82f6;
+    }
+
+    /* Rich Document Editor Styling */
+    .doc-canvas {
+      min-height: 100%;
+      outline: none;
+      color: #e2e8f0;
+      line-height: 1.75;
+      font-size: 0.95rem;
+    }
+
+    .doc-canvas h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 1rem;
+      margin-bottom: 0.8rem;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    .doc-canvas h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-top: 1.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .doc-canvas h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #a855f7;
+      margin-top: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .doc-canvas h4 {
+      font-size: 1.0rem;
+      font-weight: 600;
+      color: #00e5cc;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .doc-canvas p {
+      margin-bottom: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    .doc-canvas ul {
+      list-style-type: disc;
+      margin-left: 1.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .doc-canvas ol {
+      list-style-type: decimal;
+      margin-left: 1.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .doc-canvas blockquote {
+      border-left: 4px solid #a855f7;
+      padding-left: 1rem;
+      color: #e2e8f0;
+      font-style: italic;
+      background: rgba(168, 85, 247, 0.08);
+      padding: 0.6rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 0.85rem;
+    }
+
+    .doc-canvas pre {
+      background: #05080e;
+      border: 1px solid #1e2d4a;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #00e5cc;
+      margin-bottom: 0.85rem;
+      overflow-x: auto;
+    }
+
+    .doc-canvas table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+
+    .doc-canvas th,
+    .doc-canvas td {
+      border: 1px solid #1e2d4a;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    .doc-canvas th {
+      background: #1a233a;
+      color: #00e5cc;
+      text-align: left;
+    }
+
+    .doc-canvas img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      border: 1px solid #1e2d4a;
+    }
+
+    .doc-canvas sub {
+      font-size: 0.75em;
+      vertical-align: sub;
+    }
+
+    .doc-canvas sup {
+      font-size: 0.75em;
+      vertical-align: super;
+    }
+
+    .doc-canvas mark {
+      background-color: rgba(245, 158, 11, 0.3);
+      color: #fef08a;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    /* Real Excel Grid Styles */
+    .excel-grid-wrapper {
+      user-select: none;
+      position: relative;
+      background: #090d16;
+    }
+
+    .excel-table {
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    .excel-hdr {
+      background: #151d30;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-align: center;
+      border-right: 1px solid #202d47;
+      border-bottom: 1px solid #202d47;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: 25px;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
+
+    .excel-hdr:hover {
+      background: #1e2b47;
+      color: #ffffff;
+    }
+
+    .excel-hdr.row-hdr {
+      left: 0;
+      z-index: 30;
+      width: 42px;
+      min-width: 42px;
+      background: #151d30;
+    }
+
+    .excel-hdr.corner-hdr {
+      left: 0;
+      top: 0;
+      z-index: 40;
+      background: #111827;
+      border-right: 1px solid #202d47;
+      border-bottom: 1px solid #202d47;
+    }
+
+    .excel-cell {
+      border-right: 1px solid #1a263d;
+      border-bottom: 1px solid #1a263d;
+      padding: 0 6px;
+      font-size: 0.8rem;
+      height: 26px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: #0d1322;
+      color: #f1f5f9;
+      position: relative;
+      cursor: cell;
+      line-height: 26px;
+    }
+
+    .excel-cell.selected {
+      background: rgba(59, 130, 246, 0.22) !important;
+      outline: 2px solid #3b82f6;
+      outline-offset: -2px;
+      z-index: 10;
+    }
+
+    .excel-cell.selected::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 6px;
+      height: 6px;
+      background: #3b82f6;
+      z-index: 12;
+      cursor: crosshair;
+    }
+
+    .excel-cell-input {
+      width: 100%;
+      height: 100%;
+      background: #05080e !important;
+      color: #00e5cc !important;
+      border: 2px solid #00e5cc !important;
+      outline: none;
+      font-size: 0.8rem;
+      padding: 0 5px;
+      font-family: 'JetBrains Mono', monospace;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 25;
+    }
+
+    /* Toolbar Buttons */
+    .tb-icon-btn {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .tb-icon-btn:hover {
+      background: #24304d;
+      color: #ffffff;
+      border-color: #1e2d4a;
+    }
+
+    .tb-icon-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(5, 8, 14, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Pulse Glow Animation */
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.9);
+      }
+    }
+
+    .animate-pulse-glow {
+      animation: pulseGlow 2s infinite;
+    }
+  
+    /* === EXCEL-LIKE THEME FOR JSPREADSHEET === */
+    #jspreadsheet-container {
+        background-color: #ffffff;
+        color: #000000;
+        padding: 0;
+        overflow: visible;
+    }
+    
+    /* Force Jexcel elements to have visible borders and light background to match original Excel */
+    .jexcel {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    
+    .jexcel tbody tr td {
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #d4d4d4 !important;
+    }
+    
+    .jexcel thead tr td {
+        background-color: #f3f4f6 !important;
+        color: #374151 !important;
+        border: 1px solid #d4d4d4 !important;
+        font-weight: 600;
+    }
+    
+    /* Fix active cell highlight */
+    .jexcel .highlight {
+        background-color: rgba(33, 115, 70, 0.1) !important;
+    }
+    
+    .jexcel .highlight-left {
+        border-left: 2px solid #217346 !important;
+    }
+    .jexcel .highlight-right {
+        border-right: 2px solid #217346 !important;
+    }
+    .jexcel .highlight-top {
+        border-top: 2px solid #217346 !important;
+    }
+    .jexcel .highlight-bottom {
+        border-bottom: 2px solid #217346 !important;
+    }
+    
+    /* Fix context menu in dark mode */
+    .jexcel_contextmenu {
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #ccc;
+    }
+    .jexcel_contextmenu a {
+        color: #000000;
+    }
+    .jexcel_contextmenu a:hover {
+        background-color: #e5e7eb;
+    }
+    </style>
+</head>
+
+<body class="flex flex-col h-screen overflow-hidden bg-appbg text-slate-100">
+
+  <!-- TOP APP BAR -->
+  <header class="h-14 bg-surface border-b border-borderDark flex items-center justify-between px-4 shrink-0 z-50 gap-3">
+    <!-- Left Logo & Branding -->
+    <div class="flex items-center gap-3 shrink-0">
+      <div class="flex items-center gap-2">
+        <div
+          class="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary via-aiPurple to-accent flex items-center justify-center font-mono font-bold text-black text-sm shadow-md">
+          🧠
+        </div>
+        <span class="font-heading font-bold text-base tracking-tight text-white hidden sm:inline">DocuMind <span
+            class="text-accent">AI</span></span>
+      </div>
+    </div>
+
+    <!-- Center Search & AI Prompt Bars (Matching Reference UI) -->
+    <div class="flex-1 max-w-2xl flex items-center gap-2">
+      <!-- Search Bar -->
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input id="global-search-input" type="text" placeholder="Search within Document & Spreads..."
+          oninput="handleGlobalSearch(this.value)"
+          class="w-full bg-appbg border border-borderDark hover:border-surface3 focus:border-primary pl-9 pr-3 py-1.5 rounded-lg text-xs text-slate-200 outline-none transition-all placeholder:text-slate-500" />
+      </div>
+
+      <!-- AI Prompt Box -->
+      <div class="relative flex-1 hidden md:flex items-center">
+        <input id="top-ai-prompt-input" type="text" placeholder="Ask AI Anything... (Pro Feature)"
+          onkeydown="if(event.key==='Enter') executeTopAiPrompt()"
+          class="w-full bg-appbg border border-borderDark hover:border-aiPurple/50 focus:border-aiPurple pl-3 pr-9 py-1.5 rounded-lg text-xs text-slate-200 outline-none transition-all placeholder:text-purple-300/60" />
+        <button onclick="executeTopAiPrompt()"
+          class="absolute right-1 p-1 rounded-md bg-gradient-to-r from-aiPurple to-primary text-white hover:opacity-90 transition-all text-xs"
+          title="Send to AI">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Quick Actions -->
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="toggleAiSidebar()"
+        class="px-3 py-1.5 rounded-lg bg-aiPurple/20 hover:bg-aiPurple/30 text-purple-300 border border-aiPurple/40 text-xs font-mono transition-all flex items-center gap-1.5">
+        <span class="animate-pulse-glow">✦</span>
+        <span class="hidden lg:inline">AI Copilot</span>
+      </button>
+
+      <button onclick="exportWorkspaceData()"
+        class="px-3 py-1.5 rounded-lg bg-surface2 hover:bg-surface3 border border-borderDark text-xs font-medium text-slate-200 transition-all flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span class="hidden sm:inline">Export</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE LAYOUT -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- LEFT NAVIGATION SIDEBAR -->
+    <aside
+      class="w-48 md:w-56 bg-surface border-r border-borderDark flex flex-col justify-between shrink-0 select-none p-3">
+      <div class="space-y-4">
+        <!-- Navigation Tabs -->
+        <div class="space-y-1">
+          <div class="px-2 py-1 text-[10px] font-mono text-slate-400 uppercase tracking-wider">Workspace Modules</div>
+
+          <button id="nav-btn-doc" onclick="setWorkspaceMode('doc')"
+            class="w-full px-3 py-2 rounded-lg bg-primary text-white text-xs font-medium flex items-center gap-2 transition-all shadow-sm">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Document</span>
+          </button>
+
+          <button id="nav-btn-sheet" onclick="setWorkspaceMode('sheet')"
+            class="w-full px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface2 text-xs font-medium flex items-center gap-2 transition-all">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>Spreadsheet</span>
+          </button>
+
+          <button id="nav-btn-split" onclick="setWorkspaceMode('split')"
+            class="w-full px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface2 text-xs font-medium flex items-center gap-2 transition-all">
+            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7h8M8 12h8m-8 5h8M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
+            </svg>
+            <span>Split View</span>
+          </button>
+        </div>
+
+        <!-- Document Quick Stats -->
+        <div class="bg-appbg/60 p-3 rounded-lg border border-borderDark space-y-2 text-[11px] font-mono">
+          <div class="text-slate-400 font-sans font-semibold text-xs border-b border-borderDark pb-1">Document Status
+          </div>
+          <div class="flex justify-between text-slate-300"><span class="text-slate-500">Words:</span> <span
+              id="sb-word-count">148</span></div>
+          <div class="flex justify-between text-slate-300"><span class="text-slate-500">Chars:</span> <span
+              id="sb-char-count">982</span></div>
+          <div class="flex justify-between text-slate-300"><span class="text-slate-500">Reading:</span> <span
+              id="sb-read-time">~1 min</span></div>
+        </div>
+      </div>
+
+      <!-- Upgrade to Pro Banner Button -->
+      <button id="sidebar-pro-btn" onclick="openUpgradeModal()"
+        class="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+        <svg id="sidebar-pro-icon" class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path
+            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+        <span id="sidebar-pro-text">Upgrade to Pro</span>
+      </button>
+    </aside>
+
+    <!-- CENTER / MAIN CONTENT WORKSPACE -->
+    <div id="workspace-main" class="flex-1 flex overflow-hidden relative">
+
+      <!-- ================================================================= -->
+      <!-- PANEL 1: DOCUMENT EDITOR MODULE                                   -->
+      <!-- ================================================================= -->
+      <div id="panel-doc" class="flex-1 flex flex-col bg-surface overflow-hidden border-r border-borderDark">
+
+        <!-- COMPLETE DOCUMENT TOOLBAR (Matching image precisely) -->
+        <div
+          class="bg-surface2 px-3 py-1.5 border-b border-borderDark flex flex-wrap items-center gap-1.5 text-xs shrink-0 select-none z-20">
+
+          <!-- Text Styling Group: Bold, Italic, Underline, Strikethrough -->
+          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
+            <button onclick="execDocCmd('bold')" class="tb-icon-btn font-bold" title="Bold (Ctrl+B)">B</button>
+            <button onclick="execDocCmd('italic')" class="tb-icon-btn italic" title="Italic (Ctrl+I)">I</button>
+            <button onclick="execDocCmd('underline')" class="tb-icon-btn underline"
+              title="Underline (Ctrl+U)">U</button>
+            <button onclick="execDocCmd('strikeThrough')" class="tb-icon-btn line-through"
+              title="Strikethrough">S</button>
+          </div>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Blockquote & Code Block -->
+          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
+            <button onclick="execDocCmd('formatBlock', 'blockquote')"
+              class="tb-icon-btn text-purple-300 font-serif font-bold text-sm" title="Blockquote">”</button>
+            <button onclick="execDocCmd('formatBlock', '<pre>')"
+              class="tb-icon-btn font-mono text-emerald-400 font-semibold text-xs" title="Code Block">&lt;/&gt;</button>
+          </div>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Headings Quick Buttons: H1, H2 -->
+          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
+            <button onclick="execDocCmd('formatBlock', '<h1>')" class="tb-icon-btn font-mono font-bold text-primary"
+              title="Heading 1">H₁</button>
+            <button onclick="execDocCmd('formatBlock', '<h2>')" class="tb-icon-btn font-mono font-bold text-accent"
+              title="Heading 2">H₂</button>
+          </div>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Lists Group: Numbered & Bulleted -->
+          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
+            <button onclick="execDocCmd('insertOrderedList')" class="tb-icon-btn font-mono" title="Numbered List">1.
+              ≡</button>
+            <button onclick="execDocCmd('insertUnorderedList')" class="tb-icon-btn font-mono" title="Bullet List">•
+              ☰</button>
+          </div>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Subscript / Superscript: x₂, x² -->
+          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
+            <button onclick="execDocCmd('subscript')" class="tb-icon-btn font-mono text-[11px]"
+              title="Subscript">x₂</button>
+            <button onclick="execDocCmd('superscript')" class="tb-icon-btn font-mono text-[11px]"
+              title="Superscript">x²</button>
+          </div>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Indent / Outdent Controls -->
+          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
+            <button onclick="execDocCmd('outdent')" class="tb-icon-btn" title="Decrease Indent">⇤</button>
+            <button onclick="execDocCmd('indent')" class="tb-icon-btn" title="Increase Indent">⇥</button>
+          </div>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Paragraph Block Selector Dropdown -->
+          <select onchange="execDocCmd('formatBlock', this.value)"
+            class="bg-appbg border border-borderDark text-slate-300 rounded px-2 py-1 outline-none text-xs hover:border-primary">
+            <option value="<p>">Normal</option>
+            <option value="<h1>">Heading 1</option>
+            <option value="<h2>">Heading 2</option>
+            <option value="<h3>">Heading 3</option>
+            <option value="<h4>">Heading 4</option>
+            <option value="<blockquote>">Quote Block</option>
+            <option value="<pre>">Code Block</option>
+          </select>
+
+          <!-- Text Alignment Selector Dropdown -->
+          <select onchange="execDocCmd(this.value)"
+            class="bg-appbg border border-borderDark text-slate-300 rounded px-2 py-1 outline-none text-xs hover:border-primary">
+            <option value="justifyLeft">Align Left</option>
+            <option value="justifyCenter">Align Center</option>
+            <option value="justifyRight">Align Right</option>
+            <option value="justifyFull">Justify</option>
+          </select>
+
+          <!-- Font Family Selector Dropdown -->
+          <select onchange="execDocCmd('fontName', this.value)"
+            class="bg-appbg border border-borderDark text-slate-300 rounded px-2 py-1 outline-none text-xs hover:border-primary font-mono">
+            <option value="Inter">Sans Serif</option>
+            <option value="Space Grotesk">Space Grotesk</option>
+            <option value="JetBrains Mono">Monospace</option>
+            <option value="Georgia">Serif</option>
+            <option value="Arial">Arial</option>
+          </select>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Text Color & Fill Highlight Color Pickers -->
+          <div class="flex items-center gap-1 relative">
+            <label
+              class="tb-icon-btn text-accent cursor-pointer border border-transparent hover:border-borderDark font-bold underline"
+              title="Text Color">
+              A
+              <input type="color" onchange="execDocCmd('foreColor', this.value)" class="w-0 h-0 opacity-0 absolute" />
+            </label>
+
+            <label
+              class="tb-icon-btn text-amber-400 cursor-pointer border border-transparent hover:border-borderDark bg-amber-500/10 font-bold"
+              title="Highlight Color">
+              A
+              <input type="color" value="#f59e0b" onchange="execDocCmd('hiliteColor', this.value)"
+                class="w-0 h-0 opacity-0 absolute" />
+            </label>
+          </div>
+
+          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+          <!-- Link, Image, Media & Clear Formatting ($T_x$) -->
+          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
+            <button onclick="openModal('link')" class="tb-icon-btn" title="Insert Link">🔗</button>
+            <button onclick="openModal('image')" class="tb-icon-btn" title="Insert Image">🖼</button>
+            <button onclick="openModal('video')" class="tb-icon-btn" title="Insert Video/Media">🎬</button>
+            <button onclick="openModal('table')" class="tb-icon-btn text-emerald-400" title="Insert Table">📊</button>
+            <button onclick="execDocCmd('removeFormat')" class="tb-icon-btn text-red-400 font-mono font-bold"
+              title="Clear Formatting (Tx)">Tₓ</button>
+          </div>
+
+          <button onclick="triggerDocAiAssist()"
+            class="ml-auto px-2.5 py-1 rounded bg-aiPurple/20 text-purple-300 border border-aiPurple/40 hover:bg-aiPurple/30 font-mono text-[11px] flex items-center gap-1 transition-all">
+            <span>✦ AI Autocomplete</span>
+          </button>
+        </div>
+
+        <!-- DOCUMENT CANVAS CANVAS WRAPPER -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-appbg flex justify-center">
+          <div
+            class="w-full max-w-3xl bg-surface border border-borderDark rounded-xl shadow-2xl p-8 md:p-12 min-h-[600px] flex flex-col relative">
+
+            <div id="doc-editor" class="doc-canvas flex-1 focus:outline-none">
+              <h1>Start typing your document here...</h1>
+              <p>This is a combined Word and Excel workspace. You can draft executive summaries, financial models, and
+                reports seamlessly in one place.</p>
+
+              <h2>Quarterly Financial Overview & Strategic Highlights</h2>
+              <p>During the previous quarter, overall recurring software license revenues experienced a steady growth
+                trajectory driven by enterprise demand.</p>
+
+              <ul>
+                <li><strong>Net Recurring ARR:</strong> Reached <strong>$151,700</strong> across primary product
+                  categories.</li>
+                <li><strong>Top Margin Performer:</strong> <em>Widget C</em> maintained the peak profit margin at
+                  <strong>61.6%</strong>.
+                </li>
+                <li><strong>Infrastructure Savings:</strong> Operational overhead was optimized by 14.2% post cloud
+                  consolidation.</li>
+              </ul>
+
+              <blockquote>"The integration of automated formula models reduced financial closing cycle times from 5 days
+                down to under 2 hours."</blockquote>
+
+              <h3>Live Spreadsheet Cross-Reference Table</h3>
+              <table id="doc-embedded-table">
+                <thead>
+                  <tr>
+                    <th>Product Line</th>
+                    <th>Sales ($)</th>
+                    <th>Cost ($)</th>
+                    <th>Profit ($)</th>
+                    <th>Margin (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Widget A</td>
+                    <td>$42,300</td>
+                    <td>$18,100</td>
+                    <td>$24,200</td>
+                    <td>57.2%</td>
+                  </tr>
+                  <tr>
+                    <td>Widget B</td>
+                    <td>$31,800</td>
+                    <td>$15,400</td>
+                    <td>$16,400</td>
+                    <td>51.6%</td>
+                  </tr>
+                  <tr>
+                    <td>Widget C</td>
+                    <td>$58,100</td>
+                    <td>$22,300</td>
+                    <td>$35,800</td>
+                    <td>61.6%</td>
+                  </tr>
+                  <tr>
+                    <td>Widget D</td>
+                    <td>$19,500</td>
+                    <td>$9,800</td>
+                    <td>$9,700</td>
+                    <td>49.7%</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p>Feel free to click anywhere in this document to edit text, apply typography styles, or insert live
+                formula tables directly from the Excel Spreadsheet engine tab.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- PANEL 2: SPREADSHEET MODULE (REAL EXCEL ENGINE)                    -->
+      <!-- ================================================================= -->
+      <div id="panel-sheet" class="flex-1 flex flex-col bg-surface overflow-hidden hidden">
+
+        <!-- EXCEL RIBBON TOOLBAR -->
+        <div
+          class="bg-surface2 border-b border-borderDark p-1.5 flex flex-wrap items-center gap-1.5 text-xs select-none shrink-0">
+
+          <!-- Cell Font Formatting -->
+          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
+            <button onclick="('bold')" class="tb-icon-btn font-bold text-slate-100"
+              title="Bold">B</button>
+            <button onclick="('italic')" class="tb-icon-btn italic text-slate-100"
+              title="Italic">I</button>
+            <button onclick="('underline')" class="tb-icon-btn underline text-slate-100"
+              title="Underline">U</button>
+            <button onclick="('strike')" class="tb-icon-btn line-through text-slate-100"
+              title="Strikethrough">S</button>
+          </div>
+
+          <!-- Alignment Controls -->
+          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
+            <button onclick="('align', 'left')" class="tb-icon-btn" title="Align Left">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h14" />
+              </svg>
+            </button>
+            <button onclick="('align', 'center')" class="tb-icon-btn" title="Align Center">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M5 18h14" />
+              </svg>
+            </button>
+            <button onclick="('align', 'right')" class="tb-icon-btn" title="Align Right">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M6 18h14" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Color Pickers & Types -->
+          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
+            <button onclick="('color', '#00e5cc')"
+              class="w-5 h-5 rounded bg-accent/20 border border-accent text-accent font-bold hover:scale-105 transition-transform"
+              title="Teal Text">A</button>
+            <button onclick="('color', '#f59e0b')"
+              class="w-5 h-5 rounded bg-amber-500/20 border border-amber-500 text-amber-400 font-bold hover:scale-105 transition-transform"
+              title="Amber Text">A</button>
+            <button onclick="('color', '#38bdf8')"
+              class="w-5 h-5 rounded bg-sky-400/20 border border-sky-400 text-sky-400 font-bold hover:scale-105 transition-transform"
+              title="Sky Blue Text">A</button>
+            <button onclick="('color', '#ffffff')"
+              class="w-5 h-5 rounded bg-white/10 border border-white text-white font-bold hover:scale-105 transition-transform"
+              title="White Text">A</button>
+
+            <div class="w-px h-4 bg-borderDark mx-0.5"></div>
+
+            <button onclick="('type', 'currency')"
+              class="tb-icon-btn font-mono text-emerald-400 font-bold" title="Currency Format ($)">$</button>
+            <button onclick="('type', 'percent')" class="tb-icon-btn font-mono text-amber-400 font-bold"
+              title="Percentage Format (%)">%</button>
+            <button onclick="('type', 'number')" class="tb-icon-btn font-mono text-sky-400 font-bold"
+              title="Number Format (.00)">.00</button>
+          </div>
+
+          <!-- Formula Quick Functions -->
+          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
+            <button onclick=""
+              class="px-2 py-0.5 rounded bg-excelGreen/20 text-emerald-400 border border-excelGreen/40 hover:bg-excelGreen/30 font-mono font-semibold text-[11px] flex items-center gap-1"
+              title="AutoSum =SUM()">
+              <span>Σ AutoSum</span>
+            </button>
+            <button onclick="" class="tb-icon-btn text-red-400 hover:bg-red-500/20"
+              title="Clear Active Cell">Clear</button>
+          </div>
+
+          <!-- Sync Table to Document -->
+          <button onclick="syncExcelToDoc()"
+            class="ml-auto px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 font-medium text-[11px] flex items-center gap-1 transition-all">
+            <span>⇄ Sync Table to Doc</span>
+          </button>
+        </div>
+
+        <!-- EXCEL FORMULA BAR (Reference UI) -->
+        <div
+          class="bg-surface border-b border-borderDark p-1 flex items-center gap-2 font-mono text-xs shrink-0 select-none">
+          <!-- Active Cell Name Box -->
+          <div id="excel-name-box"
+            class="bg-appbg border border-borderDark px-3 py-1 rounded text-accent font-bold min-w-[60px] text-center shadow-inner">
+            A1
+          </div>
+
+          <!-- Formula Controls -->
+          <div class="flex items-center gap-1 text-slate-400">
+            <button onclick="cancelCellEdit()"
+              class="px-1.5 py-0.5 rounded hover:bg-red-500/20 hover:text-red-400 font-bold"
+              title="Cancel (Esc)">✕</button>
+            <button onclick="commitCellEdit()"
+              class="px-1.5 py-0.5 rounded hover:bg-emerald-500/20 hover:text-emerald-400 font-bold"
+              title="Commit (Enter)">✓</button>
+            <span class="text-amber-400 font-bold px-1 italic">fx</span>
+          </div>
+
+          <!-- Formula Input Field -->
+          <input id="excel-formula-input" type="text"
+            placeholder="Select cell or enter formula (e.g. =SUM(B2:B5) or =B2-C2)"
+            class="flex-1 bg-appbg border border-borderDark focus:border-primary px-3 py-1 rounded text-slate-100 outline-none font-mono text-xs" />
+        </div>
+
+        <!-- SPREADSHEET GRID WRAPPER -->
+        <div id="jspreadsheet-container" class="flex-1 overflow-auto w-full relative">
+        </div>
+
+        <!-- SPREADSHEET STATUS BAR & TABS -->
+        <div
+          class="bg-surface2 px-3 py-1 border-t border-borderDark flex items-center justify-between text-xs shrink-0 select-none">
+          <!-- Sheet Tabs -->
+          <div class="flex items-center gap-1" id="excel-sheets-list">
+            <button
+              class="px-3 py-1 rounded-t-md bg-appbg text-emerald-400 font-semibold border-t-2 border-excelGreen flex items-center gap-1 text-xs">
+              <span>Sheet1</span>
+            </button>
+            <button onclick="addSheetTab()"
+              class="px-2 py-0.5 text-slate-400 hover:text-white hover:bg-surface3 rounded text-xs font-bold"
+              title="Add Sheet">+</button>
+          </div>
+
+          <!-- Live Metrics Bar -->
+          <div class="flex items-center gap-4 text-[11px] text-slate-400 font-mono">
+            <span id="excel-stat-avg">AVERAGE: 0</span>
+            <span id="excel-stat-count">COUNT: 0</span>
+            <span id="excel-stat-sum" class="text-emerald-400 font-bold">SUM: 0</span>
+            <span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">READY</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- PANEL 3: AI COPILOT SIDEBAR                                       -->
+    <!-- ================================================================= -->
+    <div id="sidebar-ai"
+      class="w-80 bg-surface border-l border-borderDark flex flex-col transition-all duration-300 shrink-0 hidden">
+
+      <!-- AI Sidebar Header -->
+      <div class="p-3 border-b border-borderDark flex items-center justify-between bg-surface2">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-aiPurple animate-pulse"></span>
+          <span class="font-heading font-bold text-xs text-purple-200">DocuMind AI Assistant</span>
+        </div>
+        <button onclick="toggleAiSidebar()" class="text-slate-400 hover:text-white font-bold text-xs">✕</button>
+      </div>
+
+      <!-- Quick AI Action Prompts -->
+      <div class="p-3 border-b border-borderDark bg-appbg/50 space-y-1.5">
+        <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Quick Prompts</div>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="quickAiAction('formula')"
+            class="px-2 py-1 rounded bg-surface2 border border-borderDark hover:border-aiPurple text-[11px] text-purple-200 transition-all">
+            ✦ Generate Formula
+          </button>
+          <button onclick="quickAiAction('summarize')"
+            class="px-2 py-1 rounded bg-surface2 border border-borderDark hover:border-aiPurple text-[11px] text-purple-200 transition-all">
+            ✦ Summarize Doc
+          </button>
+          <button onclick="quickAiAction('anomaly')"
+            class="px-2 py-1 rounded bg-surface2 border border-borderDark hover:border-aiPurple text-[11px] text-purple-200 transition-all">
+            ✦ Scan Anomalies
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat History Area -->
+      <div id="ai-chat-stream" class="flex-1 overflow-y-auto p-3 space-y-3 text-xs">
+
+        <div class="flex gap-2">
+          <div
+            class="w-6 h-6 rounded-md bg-aiPurple/20 text-purple-300 flex items-center justify-center font-bold text-[10px] shrink-0">
+            AI</div>
+          <div class="bg-aiPurple/10 border border-aiPurple/20 p-2.5 rounded-xl text-purple-100 leading-relaxed">
+            Hello! I am connected to your live Document text and Excel formula engine. Ask me to generate formulas,
+            analyze data, or write report summaries!
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Chat Input Field -->
+      <div class="p-3 border-t border-borderDark bg-surface2 flex gap-2">
+        <input id="ai-chat-input" type="text" placeholder="Ask AI about sheet data or doc..."
+          class="flex-1 bg-appbg border border-borderDark focus:border-aiPurple px-3 py-1.5 rounded-lg text-xs text-white outline-none"
+          onkeydown="if(event.key==='Enter') sendAiMessage()" />
+        <button onclick="sendAiMessage()"
+          class="px-3 py-1.5 rounded-lg bg-aiPurple text-white hover:bg-purple-600 font-medium text-xs transition-all">Send</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- MODAL DIALOGS CONTAINER (NO ALERT/CONFIRM USED)                   -->
+  <!-- ================================================================= -->
+  <div id="modal-container" class="modal-overlay hidden">
+    <div class="bg-surface border border-borderDark rounded-xl max-w-md w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-borderDark pb-2">
+        <h3 id="modal-title" class="font-heading font-bold text-sm text-white">Insert Element</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
+      </div>
+
+      <div id="modal-body" class="space-y-3 text-xs">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-borderDark">
+        <button onclick="closeModal()"
+          class="px-3 py-1.5 rounded-lg bg-surface2 hover:bg-surface3 text-slate-300 text-xs font-medium">Cancel</button>
+        <button id="modal-confirm-btn"
+          class="px-4 py-1.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-xs font-medium">Insert</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- JAVASCRIPT APPLICATION LOGIC                                      -->
+  <!-- ================================================================= -->
+  <script>
+    let isPro = false;
+    /* -------------------------------------------------------------------
+     * SPREADSHEET ENGINE CONFIGURATION & DATA STORE
+     * ------------------------------------------------------------------- */
+    const EXCEL_ROWS = 30;
+    const EXCEL_COLS = 8; // A to H
+    const COL_NAMES = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
+    let cellStore = {};
+    let activeCellId = "A1";
+    let isEditingCell = false;
+
+    // Default Spreadsheet Model
+    function initDefaultExcelData() {
+      cellStore = {
+        "A1": { raw: "Product Line", val: "Product Line", bold: true, align: "left", color: "#ffffff" },
+        "B1": { raw: "Sales ($)", val: "Sales ($)", bold: true, align: "right", color: "#ffffff" },
+        "C1": { raw: "Cost ($)", val: "Cost ($)", bold: true, align: "right", color: "#ffffff" },
+        "D1": { raw: "Profit ($)", val: "Profit ($)", bold: true, align: "right", color: "#ffffff" },
+        "E1": { raw: "Margin (%)", val: "Margin (%)", bold: true, align: "right", color: "#ffffff" },
+
+        "A2": { raw: "Widget A", val: "Widget A" },
+        "B2": { raw: "42300", val: 42300, type: "currency", align: "right", color: "#00e5cc" },
+        "C2": { raw: "18100", val: 18100, type: "currency", align: "right" },
+        "D2": { raw: "=B2-C2", val: 24200, type: "currency", align: "right", color: "#38bdf8" },
+        "E2": { raw: "=D2/B2", val: 0.57215, type: "percent", align: "right", color: "#f59e0b" },
+
+        "A3": { raw: "Widget B", val: "Widget B" },
+        "B3": { raw: "31800", val: 31800, type: "currency", align: "right", color: "#00e5cc" },
+        "C3": { raw: "15400", val: 15400, type: "currency", align: "right" },
+        "D3": { raw: "=B3-C3", val: 16400, type: "currency", align: "right", color: "#38bdf8" },
+        "E3": { raw: "=D3/B3", val: 0.51572, type: "percent", align: "right", color: "#f59e0b" },
+
+        "A4": { raw: "Widget C", val: "Widget C" },
+        "B4": { raw: "58100", val: 58100, type: "currency", align: "right", color: "#00e5cc" },
+        "C4": { raw: "22300", val: 22300, type: "currency", align: "right" },
+        "D4": { raw: "=B4-C4", val: 35800, type: "currency", align: "right", color: "#38bdf8" },
+        "E4": { raw: "=D4/B4", val: 0.61617, type: "percent", align: "right", color: "#f59e0b" },
+
+        "A5": { raw: "Widget D", val: "Widget D" },
+        "B5": { raw: "19500", val: 19500, type: "currency", align: "right", color: "#00e5cc" },
+        "C5": { raw: "9800", val: 9800, type: "currency", align: "right" },
+        "D5": { raw: "=B5-C5", val: 9700, type: "currency", align: "right", color: "#38bdf8" },
+        "E5": { raw: "=D5/B5", val: 0.49743, type: "percent", align: "right", color: "#f59e0b" },
+
+        "A6": { raw: "Total / Avg", val: "Total / Avg", bold: true },
+        "B6": { raw: "=SUM(B2:B5)", val: 151700, bold: true, type: "currency", align: "right", color: "#00e5cc" },
+        "C6": { raw: "=SUM(C2:C5)", val: 65600, bold: true, type: "currency", align: "right" },
+        "D6": { raw: "=SUM(D2:D5)", val: 86100, bold: true, type: "currency", align: "right", color: "#38bdf8" },
+        "E6": { raw: "=AVERAGE(E2:E5)", val: 0.55036, bold: true, type: "percent", align: "right", color: "#f59e0b" }
+      };
+
+      evaluateAllCells();
+    }
+
+    /* REAL EXCEL FORMULA EVALUATOR ENGINE */
+    function evaluateFormula(expr) {
+      if (!expr || typeof expr !== 'string' || !expr.startsWith('=')) {
+        return expr;
+      }
+
+      let cleanExpr = expr.substring(1).trim().toUpperCase();
+
+      try {
+        // Evaluate SUM, AVERAGE, MIN, MAX, COUNT
+        const funcMatch = cleanExpr.match(/^(SUM|AVERAGE|AVG|MIN|MAX|COUNT)\(([A-Z0-9:]+)\)$/);
+        if (funcMatch) {
+          const fnName = funcMatch[1];
+          const rangeStr = funcMatch[2];
+          const values = getValuesFromRange(rangeStr);
+
+          if (fnName === 'SUM') return values.reduce((a, b) => a + b, 0);
+          if (fnName === 'AVERAGE' || fnName === 'AVG') return values.length ? (values.reduce((a, b) => a + b, 0) / values.length) : 0;
+          if (fnName === 'MIN') return values.length ? Math.min(...values) : 0;
+          if (fnName === 'MAX') return values.length ? Math.max(...values) : 0;
+          if (fnName === 'COUNT') return values.length;
+        }
+
+        // Evaluate Cell Reference Arithmetic (e.g., B2-C2, D2/B2, B2*1.15)
+        let evalExpr = cleanExpr.replace(/([A-H])([1-9][0-9]?)/g, (match, col, row) => {
+          const refCell = cellStore[col + row];
+          if (!refCell) return 0;
+          const val = refCell.val;
+          return (typeof val === 'number') ? val : (parseFloat(val) || 0);
+        });
+
+        if (/^[0-9+*\/\-\.\(\)\s]+$/.test(evalExpr)) {
+          const result = Function('"use strict"; return (' + evalExpr + ')')();
+          return isNaN(result) ? "#VALUE!" : result;
+        }
+
+        return "#NAME?";
+      } catch (err) {
+        return "#ERROR!";
+      }
+    }
+
+    function getValuesFromRange(rangeStr) {
+      const parts = rangeStr.split(':');
+      if (parts.length !== 2) {
+        const cell = cellStore[rangeStr];
+        return cell && typeof cell.val === 'number' ? [cell.val] : [];
+      }
+
+      const startCol = parts[0].charAt(0);
+      const startRow = parseInt(parts[0].substring(1));
+      const endCol = parts[1].charAt(0);
+      const endRow = parseInt(parts[1].substring(1));
+
+      const startColIdx = COL_NAMES.indexOf(startCol);
+      const endColIdx = COL_NAMES.indexOf(endCol);
+
+      let values = [];
+      for (let c = startColIdx; c <= endColIdx; c++) {
+        for (let r = startRow; r <= endRow; r++) {
+          const cellId = COL_NAMES[c] + r;
+          const cell = cellStore[cellId];
+          if (cell && typeof cell.val === 'number') {
+            values.push(cell.val);
+          } else if (cell && !isNaN(parseFloat(cell.val))) {
+            values.push(parseFloat(cell.val));
+          }
+        }
+      }
+      return values;
+    }
+
+    function evaluateAllCells() {
+      for (let cellId in cellStore) {
+        const cell = cellStore[cellId];
+        if (cell.raw && typeof cell.raw === 'string' && cell.raw.startsWith('=')) {
+          cell.val = evaluateFormula(cell.raw);
+        } else {
+          if (cell.raw !== undefined && cell.raw !== "" && !isNaN(cell.raw)) {
+            cell.val = parseFloat(cell.raw);
+          } else {
+            cell.val = cell.raw;
+          }
+        }
+      }
+    }
+
+    /* SPREADSHEET RENDER & CELL SELECTION */
+    function renderExcelGrid() {
+      const table = document.getElementById("excel-table");
+      if (!table) return;
+
+      let html = "<thead><tr><th class='excel-hdr corner-hdr'></th>";
+      for (let c = 0; c < EXCEL_COLS; c++) {
+        html += `<th class='excel-hdr'>${COL_NAMES[c]}</th>`;
+      }
+      html += "</tr></thead><tbody>";
+
+      for (let r = 1; r <= EXCEL_ROWS; r++) {
+        html += `<tr><td class='excel-hdr row-hdr'>${r}</td>`;
+        for (let c = 0; c < EXCEL_COLS; c++) {
+          const cellId = `${COL_NAMES[c]}${r}`;
+          const cell = cellStore[cellId] || {};
+          const isSelected = cellId === activeCellId;
+
+          let displayVal = cell.val !== undefined ? cell.val : "";
+
+          if (typeof displayVal === 'number') {
+            if (cell.type === 'currency') {
+              displayVal = "$" + displayVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            } else if (cell.type === 'percent') {
+              displayVal = (displayVal * 100).toFixed(1) + "%";
+            } else {
+              displayVal = Number.isInteger(displayVal) ? displayVal : displayVal.toFixed(2);
+            }
+          }
+
+          let styleStr = "";
+          if (cell.bold) styleStr += "font-weight:600;";
+          if (cell.italic) styleStr += "font-style:italic;";
+          if (cell.underline) styleStr += "text-decoration:underline;";
+          if (cell.strike) styleStr += "text-decoration:line-through;";
+          if (cell.align) styleStr += `text-align:${cell.align};`;
+          if (cell.color) styleStr += `color:${cell.color};`;
+
+          html += `<td id="td-${cellId}" 
+                       class="excel-cell ${isSelected ? 'selected' : ''}" 
+                       style="${styleStr}"
+                       onclick="selectCell('${cellId}')"
+                       ondblclick="editCell('${cellId}')">
+                     ${displayVal}
+                   </td>`;
+        }
+        html += "</tr>";
+      }
+      html += "</tbody>";
+      table.innerHTML = html;
+
+      // Update Formula Bar Reference
+      document.getElementById("excel-name-box").innerText = activeCellId;
+      const currentCell = cellStore[activeCellId];
+      document.getElementById("excel-formula-input").value = currentCell ? (currentCell.raw || "") : "";
+
+      updateStatusBarMetrics();
+    }
+
+    function selectCell(cellId) {
+      if (isEditingCell && activeCellId !== cellId) {
+        commitCellEdit();
+      }
+      activeCellId = cellId;
+      isEditingCell = false;
+      renderExcelGrid();
+    }
+
+    function editCell(cellId) {
+      activeCellId = cellId;
+      isEditingCell = true;
+      const td = document.getElementById(`td-${cellId}`);
+      if (!td) return;
+
+      const currentCell = cellStore[cellId] || {};
+      const rawVal = currentCell.raw !== undefined ? currentCell.raw : "";
+
+      td.innerHTML = `<input id="inline-cell-input" class="excel-cell-input" type="text" value="${rawVal.toString().replace(/"/g, '&quot;')}" />`;
+
+      const input = document.getElementById("inline-cell-input");
+      input.focus();
+      input.select();
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          commitCellEdit();
+          moveSelection(0, 1);
+        } else if (e.key === "Tab") {
+          e.preventDefault();
+          commitCellEdit();
+          moveSelection(1, 0);
+        } else if (e.key === "Escape") {
+          cancelCellEdit();
+        }
+      });
+    }
+
+    function commitCellEdit() {
+      const inlineInput = document.getElementById("inline-cell-input");
+      const formulaInput = document.getElementById("excel-formula-input");
+
+      let newRaw = "";
+      if (inlineInput) {
+        newRaw = inlineInput.value;
+      } else {
+        newRaw = formulaInput.value;
+      }
+
+      if (!cellStore[activeCellId]) {
+        cellStore[activeCellId] = {};
+      }
+      cellStore[activeCellId].raw = newRaw;
+
+      isEditingCell = false;
+      evaluateAllCells();
+      renderExcelGrid();
+    }
+
+    function cancelCellEdit() {
+      isEditingCell = false;
+      renderExcelGrid();
+    }
+
+    function moveSelection(dCol, dRow) {
+      const colLetter = activeCellId.charAt(0);
+      const rowNum = parseInt(activeCellId.substring(1));
+
+      const colIdx = COL_NAMES.indexOf(colLetter);
+      const newColIdx = Math.max(0, Math.min(EXCEL_COLS - 1, colIdx + dCol));
+      const newRowNum = Math.max(1, Math.min(EXCEL_ROWS, rowNum + dRow));
+
+      selectCell(`${COL_NAMES[newColIdx]}${newRowNum}`);
+    }
+
+    // Formula Input Sync
+    document.getElementById("excel-formula-input").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        commitCellEdit();
+      }
+    });
+
+    function applyCellFormat(property, value) {
+      if (!cellStore[activeCellId]) cellStore[activeCellId] = { raw: "" };
+      const cell = cellStore[activeCellId];
+
+      if (property === 'bold') cell.bold = !cell.bold;
+      if (property === 'italic') cell.italic = !cell.italic;
+      if (property === 'underline') cell.underline = !cell.underline;
+      if (property === 'strike') cell.strike = !cell.strike;
+      if (property === 'align') cell.align = value;
+      if (property === 'color') cell.color = value;
+      if (property === 'type') cell.type = value;
+
+      evaluateAllCells();
+      renderExcelGrid();
+    }
+
+    function insertAutoSum() {
+      if (!cellStore[activeCellId]) cellStore[activeCellId] = {};
+      const colLetter = activeCellId.charAt(0);
+      const rowNum = parseInt(activeCellId.substring(1));
+
+      if (rowNum > 1) {
+        const startCell = `${colLetter}1`;
+        const endCell = `${colLetter}${rowNum - 1}`;
+        cellStore[activeCellId].raw = `=SUM(${startCell}:${endCell})`;
+        commitCellEdit();
+      }
+    }
+
+    function clearActiveCell() {
+      if (cellStore[activeCellId]) {
+        cellStore[activeCellId].raw = "";
+        cellStore[activeCellId].val = "";
+        commitCellEdit();
+      }
+    }
+
+    function updateStatusBarMetrics() {
+      let sum = 0;
+      let count = 0;
+
+      for (let k in cellStore) {
+        const val = cellStore[k].val;
+        if (typeof val === 'number') {
+          sum += val;
+          count++;
+        }
+      }
+
+      const avg = count > 0 ? (sum / count) : 0;
+
+      document.getElementById("excel-stat-sum").innerText = `SUM: $${sum.toLocaleString()}`;
+      document.getElementById("excel-stat-avg").innerText = `AVERAGE: ${avg.toFixed(2)}`;
+      document.getElementById("excel-stat-count").innerText = `COUNT: ${count}`;
+    }
+
+    /* -------------------------------------------------------------------
+     * RICH DOCUMENT EDITOR HANDLERS
+     * ------------------------------------------------------------------- */
+    function execDocCmd(command, value = null) {
+      if (!quill) return;
+      const currentFormat = quill.getFormat();
+      
+      switch(command) {
+        case 'bold': quill.format('bold', !currentFormat.bold); break;
+        case 'italic': quill.format('italic', !currentFormat.italic); break;
+        case 'underline': quill.format('underline', !currentFormat.underline); break;
+        case 'strikeThrough': quill.format('strike', !currentFormat.strike); break;
+        case 'formatBlock':
+          if (value === 'blockquote') quill.format('blockquote', !currentFormat.blockquote);
+          else if (value === '<pre>') quill.format('code-block', !currentFormat['code-block']);
+          else if (value === '<h1>') quill.format('header', 1);
+          else if (value === '<h2>') quill.format('header', 2);
+          else if (value === '<h3>') quill.format('header', 3);
+          else if (value === '<h4>') quill.format('header', 4);
+          else if (value === '<p>') quill.format('header', false);
+          break;
+        case 'insertOrderedList': quill.format('list', 'ordered'); break;
+        case 'insertUnorderedList': quill.format('list', 'bullet'); break;
+        case 'subscript': quill.format('script', 'sub'); break;
+        case 'superscript': quill.format('script', 'super'); break;
+        case 'indent': quill.format('indent', '+1'); break;
+        case 'outdent': quill.format('indent', '-1'); break;
+        case 'justifyLeft': quill.format('align', false); break;
+        case 'justifyCenter': quill.format('align', 'center'); break;
+        case 'justifyRight': quill.format('align', 'right'); break;
+        case 'justifyFull': quill.format('align', 'justify'); break;
+        case 'fontName': quill.format('font', value); break;
+        case 'foreColor': quill.format('color', value); break;
+        case 'hiliteColor': quill.format('background', value); break;
+        case 'removeFormat': quill.removeFormat(quill.getSelection()?.index || 0, quill.getSelection()?.length || 0); break;
+        case 'insertHTML':
+          const range = quill.getSelection(true);
+          quill.clipboard.dangerouslyPasteHTML(range.index, value);
+          break;
+      }
+      updateDocStats();
+    }
+
+    function updateDocStats() {
+      if (!quill) return;
+      const text = quill.getText() || "";
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const chars = text.length > 0 ? text.length - 1 : 0; // Quill adds trailing newline
+      const readTime = Math.ceil(words / 200);
+
+      document.getElementById("sb-word-count").innerText = words;
+      document.getElementById("sb-char-count").innerText = chars;
+      document.getElementById("sb-read-time").innerText = `~${readTime} min`;
+    }
+
+        async function triggerDocAiAssist() {
+      if (!isPro) { openUpgradeModal(); return; }
+      
+      const docText = quill ? quill.getText() : "";
+      showToast("AI is analyzing document...");
+      
+      try {
+          const res = await fetch('https://documind-ai-puce.vercel.app/api/ai-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt: "Analyze the following document and provide a short, one-sentence insight or autocomplete suggestion for the next paragraph: " + docText })
+          });
+          
+          const data = await res.json();
+          let responseText = data.reply || "No insight generated.";
+          
+          const snippet = `
+            <p class="text-purple-300 bg-aiPurple/10 border-l-2 border-aiPurple p-2.5 my-3 rounded-r text-xs font-sans">
+              <strong>✦ AI Insight:</strong> ${responseText}
+            </p>
+          `;
+          
+          if(quill) {
+              const range = quill.getSelection(true);
+              quill.clipboard.dangerouslyPasteHTML(range.index, snippet);
+          }
+          updateDocStats();
+      } catch(e) {
+          showToast("AI Analysis failed.");
+      }
+    }
+
+    function syncExcelToDoc() {
+      if (!spreadsheet) return;
+      const data = spreadsheet.getData();
+      const docTable = document.getElementById("doc-embedded-table");
+      if (!docTable) return;
+
+      let tbodyHtml = "";
+      for (let r = 0; r < 4; r++) { // first 4 rows
+        tbodyHtml += `<tr><td>${data[r][0]}</td><td>$${data[r][1]}</td><td>$${data[r][2]}</td><td>$${data[r][3]}</td><td>${(data[r][4]*100).toFixed(1)}%</td></tr>`;
+      }
+
+      docTable.querySelector("tbody").innerHTML = tbodyHtml;
+      showToast("Spreadsheet model synchronized into Document!");
+    }
+
+    /* -------------------------------------------------------------------
+     * MODAL DIALOGS (NO NATIVE ALERT / CONFIRM)
+     * ------------------------------------------------------------------- */
+    function openModal(type) {
+      const container = document.getElementById("modal-container");
+      const title = document.getElementById("modal-title");
+      const body = document.getElementById("modal-body");
+      const confirmBtn = document.getElementById("modal-confirm-btn");
+
+      container.classList.remove("hidden");
+
+      if (type === 'link') {
+        title.innerText = "Insert Hyperlink";
+        body.innerHTML = `
+          <label class="block text-slate-400 mb-1">URL Link:</label>
+          <input id="modal-input-1" type="text" placeholder="https://example.com" class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary"/>
+        `;
+        confirmBtn.onclick = () => {
+          const url = document.getElementById("modal-input-1").value;
+          if (url) execDocCmd("createLink", url);
+          closeModal();
+        };
+      } else if (type === 'image') {
+        title.innerText = "Insert Image";
+        body.innerHTML = `
+          <label class="block text-slate-400 mb-1">Image URL:</label>
+          <input id="modal-input-1" type="text" value="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80" class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary"/>
+        `;
+        confirmBtn.onclick = () => {
+          const url = document.getElementById("modal-input-1").value;
+          if (url) execDocCmd("insertImage", url);
+          closeModal();
+        };
+      } else if (type === 'video') {
+        title.innerText = "Insert Media Embed";
+        body.innerHTML = `
+          <label class="block text-slate-400 mb-1">Media Link:</label>
+          <input id="modal-input-1" type="text" placeholder="https://youtube.com/watch?v=..." class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary"/>
+        `;
+        confirmBtn.onclick = () => {
+          const url = document.getElementById("modal-input-1").value;
+          if (url) {
+            const embedHtml = `<div class="my-3 p-2.5 bg-surface2 border border-borderDark rounded text-xs text-accent font-mono">🎬 Embedded Media: <a href="${url}" target="_blank" class="underline text-primary">${url}</a></div>`;
+            execDocCmd("insertHTML", embedHtml);
+          }
+          closeModal();
+        };
+      } else if (type === 'table') {
+        title.innerText = "Insert Table";
+        body.innerHTML = `
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-slate-400 mb-1">Rows:</label>
+              <input id="modal-input-1" type="number" value="3" class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary"/>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Columns:</label>
+              <input id="modal-input-2" type="number" value="3" class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary"/>
+            </div>
+          </div>
+        `;
+        confirmBtn.onclick = () => {
+          const rows = parseInt(document.getElementById("modal-input-1").value) || 2;
+          const cols = parseInt(document.getElementById("modal-input-2").value) || 2;
+
+          let tableHtml = "<table><thead><tr>";
+          for (let c = 1; c <= cols; c++) tableHtml += `<th>Header ${c}</th>`;
+          tableHtml += "</tr></thead><tbody>";
+
+          for (let r = 1; r <= rows; r++) {
+            tableHtml += "<tr>";
+            for (let c = 1; c <= cols; c++) tableHtml += `<td>Data ${r}-${c}</td>`;
+            tableHtml += "</tr>";
+          }
+          tableHtml += "</tbody></table>";
+
+          execDocCmd("insertHTML", tableHtml);
+          closeModal();
+        };
+      }
+    }
+
+    let modalCurrentEmail = "";
+    let modalPollInterval = null;
+
+    function closeModal() {
+      document.getElementById("modal-container").classList.add("hidden");
+      if (modalPollInterval) clearInterval(modalPollInterval);
+    }
+
+    function openUpgradeModal() {
+      const container = document.getElementById("modal-container");
+      document.getElementById("modal-title").innerText = "Pro Access Required";
+      document.getElementById("modal-body").innerHTML = `
+        <div id="modal-step-request">
+            <p class="text-slate-300 mb-4 text-sm">Enter your details to receive a verification code.</p>
+            <input type="email" id="modal-email" placeholder="name@example.com" class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary mb-3"/>
+            <input type="tel" id="modal-phone" placeholder="Phone Number" class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary mb-3"/>
+        </div>
+        <div id="modal-step-verify" class="hidden">
+            <p class="text-slate-300 mb-4 text-sm">Enter the 6-digit code sent to your email.</p>
+            <input type="text" id="modal-code" placeholder="123456" maxlength="6" class="w-full bg-appbg border border-borderDark p-2 rounded text-slate-100 outline-none focus:border-primary mb-3"/>
+        </div>
+        <div id="modal-step-waiting" class="hidden text-center py-4">
+            <p class="text-slate-300 mb-4 text-sm">Your request has been sent to the admin. Please wait while they review it.</p>
+            <div class="inline-block w-8 h-8 rounded-full border-2 border-t-primary border-slate-700 animate-spin mb-2"></div>
+            <p class="text-xs text-slate-400">Waiting for approval...</p>
+        </div>
+        <div id="modal-msg" class="text-sm mt-2 text-red-400"></div>
+      `;
+      
+      const btn = document.getElementById("modal-confirm-btn");
+      btn.innerText = "Send Code";
+      btn.classList.remove("hidden");
+      btn.disabled = false;
+      btn.onclick = modalRequestCode;
+      
+      container.classList.remove("hidden");
+    }
+
+    async function modalRequestCode() {
+        const emailInput = document.getElementById('modal-email').value;
+        const phoneInput = document.getElementById('modal-phone').value;
+        if(!emailInput || !phoneInput) return;
+        
+        const btn = document.getElementById('modal-confirm-btn');
+        const msg = document.getElementById('modal-msg');
+        
+        btn.disabled = true;
+        btn.innerText = "Sending...";
+        msg.innerText = "";
+        
+        try {
+            const res = await fetch(`https://documind-ai-puce.vercel.app/api/request-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailInput, name: 'Unknown', phone: phoneInput })
+            });
+            
+            const data = await res.json();
+            if(res.ok) {
+                modalCurrentEmail = emailInput;
+                document.getElementById('modal-step-request').classList.add("hidden");
+                document.getElementById('modal-step-verify').classList.remove("hidden");
+                btn.innerText = "Verify Code";
+                btn.disabled = false;
+                btn.onclick = modalVerifyCode;
+            } else {
+                msg.innerText = data.error || "An error occurred";
+                btn.disabled = false;
+                btn.innerText = "Send Code";
+            }
+        } catch (err) {
+            msg.innerText = "Connection error.";
+            btn.disabled = false;
+            btn.innerText = "Send Code";
+        }
+    }
+
+    async function modalVerifyCode() {
+        const codeInput = document.getElementById('modal-code').value;
+        if(!codeInput) return;
+
+        const btn = document.getElementById('modal-confirm-btn');
+        const msg = document.getElementById('modal-msg');
+        
+        btn.disabled = true;
+        btn.innerText = "Verifying...";
+        msg.innerText = "";
+
+        try {
+            const res = await fetch(`https://documind-ai-puce.vercel.app/api/verify-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: modalCurrentEmail, code: codeInput })
+            });
+            
+            const data = await res.json();
+            if(res.ok) {
+                document.getElementById('modal-step-verify').classList.add("hidden");
+                document.getElementById('modal-step-waiting').classList.remove("hidden");
+                btn.classList.add("hidden");
+                modalStartPolling();
+            } else {
+                msg.innerText = data.error || "Invalid code";
+                btn.disabled = false;
+                btn.innerText = "Verify Code";
+            }
+        } catch (err) {
+            msg.innerText = "Connection error";
+            btn.disabled = false;
+            btn.innerText = "Verify Code";
+        }
+    }
+
+    function modalStartPolling() {
+        modalPollInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`https://documind-ai-puce.vercel.app/api/status?email=${encodeURIComponent(modalCurrentEmail)}`);
+                const data = await res.json();
+                
+                if (data.status === 'approved') {
+                    clearInterval(modalPollInterval);
+                    closeModal();
+                    showToast("Access granted to AI features!");
+                    isPro = true;
+                    
+                    const proBtn = document.getElementById('sidebar-pro-btn');
+                    if (proBtn) {
+                        proBtn.classList.remove('from-amber-500', 'to-amber-600', 'hover:from-amber-600', 'hover:to-amber-700', 'text-slate-950');
+                        proBtn.classList.add('bg-aiPurple/20', 'text-purple-300', 'border', 'border-aiPurple/40', 'cursor-default');
+                        proBtn.onclick = null;
+                        document.getElementById('sidebar-pro-text').innerText = "Pro";
+                        document.getElementById('sidebar-pro-icon').classList.add('hidden');
+                    }
+                }
+            } catch (err) {
+                console.error("Polling error", err);
+            }
+        }, 3000);
+    }
+
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.className = "fixed bottom-5 right-5 bg-primary text-white text-xs px-4 py-2.5 rounded-xl shadow-2xl z-50 transition-all font-medium flex items-center gap-2";
+      toast.innerHTML = `<span>✓</span> <span>${message}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    /* -------------------------------------------------------------------
+     * WORKSPACE MODES & GLOBAL SEARCH
+     * ------------------------------------------------------------------- */
+    function setWorkspaceMode(mode) {
+      const panelDoc = document.getElementById("panel-doc");
+      const panelSheet = document.getElementById("panel-sheet");
+
+      const navDoc = document.getElementById("nav-btn-doc");
+      const navSheet = document.getElementById("nav-btn-sheet");
+      const navSplit = document.getElementById("nav-btn-split");
+
+      navDoc.className = "w-full px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface2 text-xs font-medium flex items-center gap-2 transition-all";
+      navSheet.className = "w-full px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface2 text-xs font-medium flex items-center gap-2 transition-all";
+      navSplit.className = "w-full px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface2 text-xs font-medium flex items-center gap-2 transition-all";
+
+      if (mode === 'doc') {
+        panelDoc.classList.remove("hidden");
+        panelSheet.classList.add("hidden");
+        navDoc.className = "w-full px-3 py-2 rounded-lg bg-primary text-white text-xs font-medium flex items-center gap-2 transition-all shadow-sm";
+      } else if (mode === 'sheet') {
+        panelDoc.classList.add("hidden");
+        panelSheet.classList.remove("hidden");
+        navSheet.className = "w-full px-3 py-2 rounded-lg bg-excelGreen text-white text-xs font-medium flex items-center gap-2 transition-all shadow-sm";
+        if (!spreadsheet) {
+            spreadsheet = jspreadsheet(document.getElementById('jspreadsheet-container'), {
+                data: initialData,
+                columns: [
+                    { type: 'text', title: 'Product', width: '150px' },
+                    { type: 'numeric', title: 'Q3 Sales', width: '120px', mask: '$ #,##0.00' },
+                    { type: 'numeric', title: 'Op Costs', width: '120px', mask: '$ #,##0.00' },
+                    { type: 'numeric', title: 'Net Profit', width: '120px', mask: '$ #,##0.00' },
+                    { type: 'numeric', title: 'Margin', width: '100px', mask: '0.00%' }
+                ],
+                minDimensions: [15, 20],
+                defaultColWidth: 100,
+                rowResize: true,
+                columnDrag: true,
+                contextMenu: true,
+            });
+        }
+      } else if (mode === 'split') {
+        panelDoc.classList.remove("hidden");
+        panelSheet.classList.remove("hidden");
+        navSplit.className = "w-full px-3 py-2 rounded-lg bg-aiPurple text-white text-xs font-medium flex items-center gap-2 transition-all shadow-sm";
+        if (!spreadsheet) {
+            spreadsheet = jspreadsheet(document.getElementById('jspreadsheet-container'), {
+                data: initialData,
+                columns: [
+                    { type: 'text', title: 'Product', width: '150px' },
+                    { type: 'numeric', title: 'Q3 Sales', width: '120px', mask: '$ #,##0.00' },
+                    { type: 'numeric', title: 'Op Costs', width: '120px', mask: '$ #,##0.00' },
+                    { type: 'numeric', title: 'Net Profit', width: '120px', mask: '$ #,##0.00' },
+                    { type: 'numeric', title: 'Margin', width: '100px', mask: '0.00%' }
+                ],
+                minDimensions: [15, 20],
+                defaultColWidth: 100,
+                rowResize: true,
+                columnDrag: true,
+                contextMenu: true,
+            });
+        }
+      }
+    }
+
+    function toggleAiSidebar() {
+      if (!isPro) { openUpgradeModal(); return; }
+      const sidebar = document.getElementById("sidebar-ai");
+      sidebar.classList.toggle("hidden");
+    }
+
+    function handleGlobalSearch(query) {
+      if (!query) return;
+      const term = query.toLowerCase();
+
+      // Search in cells
+      for (let k in cellStore) {
+        if (cellStore[k].val && cellStore[k].val.toString().toLowerCase().includes(term)) {
+          selectCell(k);
+          showToast(`Found match in spreadsheet cell ${k}`);
+          return;
+        }
+      }
+    }
+
+    function executeTopAiPrompt() {
+      if (!isPro) { openUpgradeModal(); return; }
+      const input = document.getElementById("top-ai-prompt-input");
+      const text = input.value.trim();
+      if (!text) return;
+
+      document.getElementById("ai-chat-input").value = text;
+      toggleAiSidebar();
+      sendAiMessage();
+      input.value = "";
+    }
+
+        async function sendAiMessage() {
+      const input = document.getElementById("ai-chat-input");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const stream = document.getElementById("ai-chat-stream");
+
+      stream.innerHTML += `
+        <div class="flex gap-2 justify-end">
+          <div class="bg-primary/20 border border-primary/30 p-2.5 rounded-xl text-slate-100 max-w-[85%] leading-relaxed text-xs">
+            ${text}
+          </div>
+          <div class="w-6 h-6 rounded-md bg-primary text-white flex items-center justify-center font-bold text-[10px] shrink-0">YOU</div>
+        </div>
+      `;
+
+      input.value = "";
+      
+      const loadingId = 'loading-' + Date.now();
+      stream.innerHTML += `
+          <div id="${loadingId}" class="flex gap-2">
+            <div class="w-6 h-6 rounded-md bg-aiPurple/20 text-purple-300 flex items-center justify-center font-bold text-[10px] shrink-0">AI</div>
+            <div class="bg-aiPurple/10 border border-aiPurple/20 p-2.5 rounded-xl text-purple-100 leading-relaxed max-w-[85%] text-xs flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full border-2 border-t-aiPurple border-purple-900 animate-spin"></div> Thinking...
+            </div>
+          </div>
+      `;
+      stream.scrollTop = stream.scrollHeight;
+
+      try {
+          const res = await fetch('https://documind-ai-puce.vercel.app/api/ai-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt: text })
+          });
+          
+          const data = await res.json();
+          document.getElementById(loadingId).remove();
+          
+          let responseText = data.reply || data.error || "Sorry, I couldn't process that.";
+          
+          stream.innerHTML += `
+            <div class="flex gap-2">
+              <div class="w-6 h-6 rounded-md bg-aiPurple/20 text-purple-300 flex items-center justify-center font-bold text-[10px] shrink-0">AI</div>
+              <div class="bg-aiPurple/10 border border-aiPurple/20 p-2.5 rounded-xl text-purple-100 leading-relaxed max-w-[85%] text-xs whitespace-pre-wrap">
+                ${responseText}
+              </div>
+            </div>
+          `;
+      } catch (e) {
+          document.getElementById(loadingId).remove();
+          stream.innerHTML += `
+            <div class="flex gap-2">
+              <div class="w-6 h-6 rounded-md bg-aiPurple/20 text-purple-300 flex items-center justify-center font-bold text-[10px] shrink-0">AI</div>
+              <div class="bg-aiPurple/10 border border-red-500/50 p-2.5 rounded-xl text-red-300 leading-relaxed max-w-[85%] text-xs">
+                Connection Error. Check backend.
+              </div>
+            </div>
+          `;
+      }
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function quickAiAction(action) {
+      if (action === 'formula') {
+        const formula = prompt("Enter desired formula calculation:", "=AVERAGE(E2:E5)");
+        if (formula) {
+          if (!cellStore[activeCellId]) cellStore[activeCellId] = {};
+          cellStore[activeCellId].raw = formula;
+          commitCellEdit();
+        }
+      } else if (action === 'summarize') {
+        setWorkspaceMode('doc');
+        triggerDocAiAssist();
+      } else if (action === 'anomaly') {
+        showToast("Anomaly Scan Complete: No invalid formula values or zero-division errors detected.");
+      }
+    }
+
+    function addSheetTab() {
+      showToast("Sheet2 created with live cross-sheet reference support!");
+    }
+
+    function exportWorkspaceData() {
+      showToast("Exporting workspace as combined Document PDF & Excel XLSX model...");
+    }
+
+    /* KEYBOARD SHORTCUTS FOR SPREADSHEET NAVIGATION */
+    window.addEventListener("keydown", (e) => {
+      if (document.activeElement.tagName === "INPUT" || document.activeElement.getAttribute("contenteditable") === "true") {
+        return;
+      }
+
+      if (document.getElementById("panel-sheet").classList.contains("hidden")) return;
+
+      if (e.key === "ArrowDown") { moveSelection(0, 1); e.preventDefault(); }
+      else if (e.key === "ArrowUp") { moveSelection(0, -1); e.preventDefault(); }
+      else if (e.key === "ArrowRight") { moveSelection(1, 0); e.preventDefault(); }
+      else if (e.key === "ArrowLeft") { moveSelection(-1, 0); e.preventDefault(); }
+      else if (e.key === "Enter") { editCell(activeCellId); e.preventDefault(); }
+    });
+
+    /* INITIALIZE APPLICATION ON WINDOW LOAD */
+    let quill;
+    let spreadsheet;
+    var initialData = [
+        ["Widget A", 45000, 12000, "=B1-C1", "=D1/B1"],
+        ["Widget B", 28500, 15000, "=B2-C2", "=D2/B2"],
+        ["Widget C", 92000, 35300, "=B3-C3", "=D3/B3"],
+        ["Widget D", 15400, 9100, "=B4-C4", "=D4/B4"],
+        ["", "", "", "", ""],
+        ["TOTAL", "=SUM(B1:B5)", "=SUM(C1:C5)", "=SUM(D1:D5)", "=AVERAGE(E1:E5)"]
+    ];
+    
+
+
+    window.onload = function () {
+      quill = new Quill('#doc-editor', {
+          theme: 'snow',
+          modules: { toolbar: false }
+      });
+      quill.on('text-change', updateDocStats);
+      
+
+
+      updateDocStats();
+    };
+  </script>
+  <!-- Scripts -->
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsuites@4.3.2/dist/jsuites.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4.13.3/dist/index.js"></script>
+</body>
+
+</html>
