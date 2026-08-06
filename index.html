@@ -789,136 +789,13 @@
       <!-- ================================================================= -->
       <div id="panel-sheet" class="flex-1 flex flex-col bg-surface overflow-hidden hidden">
 
-        <!-- EXCEL RIBBON TOOLBAR -->
-        <div
-          class="bg-surface2 border-b border-borderDark p-1.5 flex flex-wrap items-center gap-1.5 text-xs select-none shrink-0">
 
-          <!-- Cell Font Formatting -->
-          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
-            <button onclick="('bold')" class="tb-icon-btn font-bold text-slate-100"
-              title="Bold">B</button>
-            <button onclick="('italic')" class="tb-icon-btn italic text-slate-100"
-              title="Italic">I</button>
-            <button onclick="('underline')" class="tb-icon-btn underline text-slate-100"
-              title="Underline">U</button>
-            <button onclick="('strike')" class="tb-icon-btn line-through text-slate-100"
-              title="Strikethrough">S</button>
-          </div>
-
-          <!-- Alignment Controls -->
-          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
-            <button onclick="('align', 'left')" class="tb-icon-btn" title="Align Left">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h14" />
-              </svg>
-            </button>
-            <button onclick="('align', 'center')" class="tb-icon-btn" title="Align Center">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M5 18h14" />
-              </svg>
-            </button>
-            <button onclick="('align', 'right')" class="tb-icon-btn" title="Align Right">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M6 18h14" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Color Pickers & Types -->
-          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
-            <button onclick="('color', '#00e5cc')"
-              class="w-5 h-5 rounded bg-accent/20 border border-accent text-accent font-bold hover:scale-105 transition-transform"
-              title="Teal Text">A</button>
-            <button onclick="('color', '#f59e0b')"
-              class="w-5 h-5 rounded bg-amber-500/20 border border-amber-500 text-amber-400 font-bold hover:scale-105 transition-transform"
-              title="Amber Text">A</button>
-            <button onclick="('color', '#38bdf8')"
-              class="w-5 h-5 rounded bg-sky-400/20 border border-sky-400 text-sky-400 font-bold hover:scale-105 transition-transform"
-              title="Sky Blue Text">A</button>
-            <button onclick="('color', '#ffffff')"
-              class="w-5 h-5 rounded bg-white/10 border border-white text-white font-bold hover:scale-105 transition-transform"
-              title="White Text">A</button>
-
-            <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-            <button onclick="('type', 'currency')"
-              class="tb-icon-btn font-mono text-emerald-400 font-bold" title="Currency Format ($)">$</button>
-            <button onclick="('type', 'percent')" class="tb-icon-btn font-mono text-amber-400 font-bold"
-              title="Percentage Format (%)">%</button>
-            <button onclick="('type', 'number')" class="tb-icon-btn font-mono text-sky-400 font-bold"
-              title="Number Format (.00)">.00</button>
-          </div>
-
-          <!-- Formula Quick Functions -->
-          <div class="flex items-center gap-1 bg-surface3/50 p-1 rounded-lg border border-borderDark">
-            <button onclick=""
-              class="px-2 py-0.5 rounded bg-excelGreen/20 text-emerald-400 border border-excelGreen/40 hover:bg-excelGreen/30 font-mono font-semibold text-[11px] flex items-center gap-1"
-              title="AutoSum =SUM()">
-              <span>Σ AutoSum</span>
-            </button>
-            <button onclick="" class="tb-icon-btn text-red-400 hover:bg-red-500/20"
-              title="Clear Active Cell">Clear</button>
-          </div>
-
-          <!-- Sync Table to Document -->
-          <button onclick="syncExcelToDoc()"
-            class="ml-auto px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 font-medium text-[11px] flex items-center gap-1 transition-all">
-            <span>⇄ Sync Table to Doc</span>
-          </button>
-        </div>
-
-        <!-- EXCEL FORMULA BAR (Reference UI) -->
-        <div
-          class="bg-surface border-b border-borderDark p-1 flex items-center gap-2 font-mono text-xs shrink-0 select-none">
-          <!-- Active Cell Name Box -->
-          <div id="excel-name-box"
-            class="bg-appbg border border-borderDark px-3 py-1 rounded text-accent font-bold min-w-[60px] text-center shadow-inner">
-            A1
-          </div>
-
-          <!-- Formula Controls -->
-          <div class="flex items-center gap-1 text-slate-400">
-            <button onclick="cancelCellEdit()"
-              class="px-1.5 py-0.5 rounded hover:bg-red-500/20 hover:text-red-400 font-bold"
-              title="Cancel (Esc)">✕</button>
-            <button onclick="commitCellEdit()"
-              class="px-1.5 py-0.5 rounded hover:bg-emerald-500/20 hover:text-emerald-400 font-bold"
-              title="Commit (Enter)">✓</button>
-            <span class="text-amber-400 font-bold px-1 italic">fx</span>
-          </div>
-
-          <!-- Formula Input Field -->
-          <input id="excel-formula-input" type="text"
-            placeholder="Select cell or enter formula (e.g. =SUM(B2:B5) or =B2-C2)"
-            class="flex-1 bg-appbg border border-borderDark focus:border-primary px-3 py-1 rounded text-slate-100 outline-none font-mono text-xs" />
-        </div>
 
         <!-- SPREADSHEET GRID WRAPPER -->
-        <div id="jspreadsheet-container" class="flex-1 overflow-auto w-full relative">
+        <div id="jspreadsheet-container" class="flex-1 w-full relative">
+          <iframe src="excel.html" class="w-full h-full border-none"></iframe>
         </div>
 
-        <!-- SPREADSHEET STATUS BAR & TABS -->
-        <div
-          class="bg-surface2 px-3 py-1 border-t border-borderDark flex items-center justify-between text-xs shrink-0 select-none">
-          <!-- Sheet Tabs -->
-          <div class="flex items-center gap-1" id="excel-sheets-list">
-            <button
-              class="px-3 py-1 rounded-t-md bg-appbg text-emerald-400 font-semibold border-t-2 border-excelGreen flex items-center gap-1 text-xs">
-              <span>Sheet1</span>
-            </button>
-            <button onclick="addSheetTab()"
-              class="px-2 py-0.5 text-slate-400 hover:text-white hover:bg-surface3 rounded text-xs font-bold"
-              title="Add Sheet">+</button>
-          </div>
-
-          <!-- Live Metrics Bar -->
-          <div class="flex items-center gap-4 text-[11px] text-slate-400 font-mono">
-            <span id="excel-stat-avg">AVERAGE: 0</span>
-            <span id="excel-stat-count">COUNT: 0</span>
-            <span id="excel-stat-sum" class="text-emerald-400 font-bold">SUM: 0</span>
-            <span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">READY</span>
-          </div>
-        </div>
 
       </div>
 
