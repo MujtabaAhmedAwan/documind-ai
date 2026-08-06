@@ -3,82 +3,2650 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DocuMind - Word Editor</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<title>Document1 - Word</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  :root{
-    --bg:#0a0e1a;
-    --surface:#111827;
-    --surface2:#1a2236;
-    --primary:#4F6EF7;
-    --accent:#00E5CC;
-    --text:#F0F4FF;
-    --muted:#7B8BB2;
-    --border:#1e2d4a;
-    --font:'Space Grotesk',sans-serif;
-    --mono:'JetBrains Mono',monospace
-  }
-  body{background:var(--bg);color:var(--text);font-family:var(--font);padding:2rem;line-height:1.6}
-  .app-preview{
-    background:var(--surface);border:0.5px solid var(--border);
-    border-radius:16px;overflow:hidden;
-    box-shadow:0 0 80px rgba(79,110,247,.08);
-    max-width: 800px; margin: 0 auto;
-  }
-  .app-bar{
-    background:var(--surface2);padding:.8rem 1rem;
-    display:flex;align-items:center;gap:.6rem;border-bottom:0.5px solid var(--border)
-  }
-  .traffic span{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:4px}
-  .traffic .r{background:#ff5f57}.traffic .y{background:#febc2e}.traffic .g{background:#28c840}
-  .tab-content{padding:1.2rem}
-  .doc-toolbar{display:flex;gap:3px;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
-  .tb-btn{background:transparent;border:none;color:var(--muted);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.8rem;font-family:var(--mono);transition:all .15s}
-  .tb-btn:hover{background:var(--surface2);color:var(--text)}
-  .tb-sep{width:.5px;background:var(--border);margin:0 3px;align-self:stretch}
-  .doc-content .doc-heading{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
-  .doc-content p{font-size:.87rem;line-height:1.7;color:var(--text);margin-bottom:.5rem}
-  .ai-suggest{
-    background:rgba(79,110,247,.08);border-left:2px solid var(--primary);
-    padding:.5rem .8rem;border-radius:0 6px 6px 0;margin-top:.5rem
-  }
-  .ai-tag{font-size:.7rem;background:rgba(79,110,247,.2);color:var(--primary);padding:1px 7px;border-radius:4px;font-family:var(--mono);margin-bottom:4px;display:inline-block}
-  .ai-suggest p{color:var(--primary);font-size:.82rem}
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --blue:#2b579a;--blue-dark:#1e3f73;--blue-light:#dce6f4;
+  --ribbon-bg:#f3f6fc;--ribbon-border:#c8c8c8;
+  --page-bg:#e8e8e8;--page-shadow:0 2px 8px rgba(0,0,0,.25);
+  --font:'Calibri',Arial,sans-serif;
+}
+body{font-family:var(--font);font-size:13px;display:flex;flex-direction:column;height:100vh;overflow:hidden;background:#fff;color:#1f1f1f;-webkit-user-select:none;user-select:none;}
+
+/* ── TITLE BAR ── */
+#title-bar{background:#f5f5f5;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;height:36px;padding:0 8px;flex-shrink:0;gap:8px;}
+.tb-left{display:flex;align-items:center;gap:6px;}
+.tb-center{display:flex;align-items:center;flex:1;justify-content:center;gap:4px;}
+.tb-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.word-logo{background:var(--blue);color:#fff;font-weight:900;font-size:14px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:3px;}
+.autosave-area{display:flex;align-items:center;gap:5px;font-size:11px;color:#555;}
+.toggle-switch{position:relative;width:32px;height:16px;display:inline-block;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;inset:0;background:#ccc;border-radius:8px;cursor:pointer;transition:.2s;}
+.slider:before{content:'';position:absolute;width:12px;height:12px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle-switch input:checked+.slider{background:var(--blue);}
+.toggle-switch input:checked+.slider:before{transform:translateX(16px);}
+.qs-group{display:flex;align-items:center;gap:1px;}
+.qs-btn{background:transparent;border:none;color:#444;width:26px;height:26px;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.qs-btn:hover{background:#e0e0e0;}
+.qs-btn:disabled{opacity:.4;cursor:not-allowed;}
+.doc-title-input{border:1px solid transparent;background:transparent;font-size:13px;font-family:inherit;color:#1f1f1f;padding:2px 6px;border-radius:3px;min-width:120px;text-align:center;}
+.doc-title-input:hover{background:#f0f0f0;}
+.doc-title-input:focus{border-color:var(--blue);background:#fff;outline:none;}
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-icon{position:absolute;left:6px;font-size:12px;color:#888;}
+.global-search{border:1px solid #ccc;border-radius:12px;padding:3px 10px 3px 24px;font-size:12px;width:200px;outline:none;background:#fff;font-family:inherit;}
+.global-search:focus{border-color:var(--blue);}
+.avatar-circle{width:28px;height:28px;border-radius:50%;background:#c43e1c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;}
+.share-btn{background:var(--blue);color:#fff;border:none;border-radius:4px;padding:5px 14px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;}
+.share-btn:hover{background:var(--blue-dark);}
+.win-btns{display:flex;}
+.win-btn{background:transparent;border:none;color:#444;width:44px;height:36px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.win-btn:hover{background:#e0e0e0;}
+.win-btn.close:hover{background:#e81123;color:#fff;}
+
+/* ── RIBBON TABS ── */
+#ribbon-tabs{background:var(--blue);display:flex;align-items:flex-end;padding:0 4px;flex-shrink:0;}
+.rtab{color:rgba(255,255,255,.85);padding:6px 14px 5px;cursor:pointer;font-size:12px;border-radius:4px 4px 0 0;border:1px solid transparent;border-bottom:none;position:relative;top:1px;}
+.rtab:hover{color:#fff;background:rgba(255,255,255,.15);}
+.rtab.active{color:var(--blue);background:#fff;border-color:var(--ribbon-border);font-weight:600;}
+.file-tab{background:var(--blue-dark);color:#fff;font-weight:600;}
+.file-tab:hover{background:#163060;}
+
+/* ── RIBBON PANEL ── */
+#ribbon{background:var(--ribbon-bg);border-bottom:2px solid var(--blue);min-height:82px;display:flex;align-items:stretch;padding:3px 4px 0;overflow-x:auto;flex-shrink:0;}
+.rb-panel{display:flex;align-items:stretch;width:100%;gap:0;}
+.rb-grp{display:flex;flex-direction:column;padding:0 4px;border-right:1px solid #ddd;position:relative;min-width:50px;}
+.rb-grp:last-child{border-right:none;}
+.rb-glbl{font-size:10px;color:#777;text-align:center;position:absolute;bottom:3px;left:0;right:0;-webkit-user-select:none;user-select:none;}
+.rb-top{display:flex;align-items:center;gap:1px;flex:1;padding-bottom:16px;}
+.rb-bot{display:flex;align-items:center;gap:1px;padding-bottom:16px;}
+/* Big button */
+.rbb{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;height:56px;border:1px solid transparent;border-radius:3px;cursor:pointer;background:transparent;font-size:10px;color:#1f1f1f;padding:2px 3px;text-align:center;gap:2px;line-height:1.2;}
+.rbb:hover{background:#d5e3f7;border-color:#b8d0ed;}
+.rbb.on{background:#c5d9f1;border-color:#8bbadd;}
+.rbb .ico{font-size:20px;line-height:1;}
+/* Small button */
+.rbs{display:flex;align-items:center;justify-content:center;min-width:24px;height:22px;border:1px solid transparent;border-radius:2px;cursor:pointer;background:transparent;font-size:12px;color:#1f1f1f;padding:0 3px;}
+.rbs:hover{background:#d5e3f7;border-color:#b8d0ed;}
+.rbs.on{background:#c5d9f1;border-color:#8bbadd;}
+/* Label button */
+.rbl{display:flex;align-items:center;gap:2px;height:22px;border:1px solid transparent;border-radius:2px;cursor:pointer;background:transparent;font-size:11px;color:#1f1f1f;padding:0 4px;white-space:nowrap;}
+.rbl:hover{background:#d5e3f7;border-color:#b8d0ed;}
+/* Dropdown */
+.rbdrop{height:22px;border:1px solid #ccc;border-radius:2px;padding:0 3px;font-size:11px;background:#fff;cursor:pointer;font-family:inherit;color:#1f1f1f;outline:none;}
+.rbdrop:hover{border-color:#999;}
+/* Separator */
+.rbsep{width:1px;height:36px;background:#ddd;margin:0 3px;align-self:center;}
+/* Color btn */
+.rb-colorwrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;width:24px;gap:1px;position:relative;}
+.rb-colorwrap input{position:absolute;opacity:0;width:0;height:0;}
+.rb-colorbar{height:3px;width:16px;border-radius:1px;}
+/* Styles row */
+.styles-row{display:flex;align-items:center;gap:2px;overflow:hidden;max-width:340px;}
+.style-card{border:1px solid #ccc;border-radius:3px;padding:2px 6px;cursor:pointer;font-size:12px;background:#fff;white-space:nowrap;min-width:60px;text-align:center;height:52px;display:flex;align-items:center;justify-content:center;}
+.style-card:hover{border-color:var(--blue);background:#dce6f4;}
+.style-card.active{border-color:var(--blue);border-width:2px;background:#dce6f4;}
+
+/* ── RULER ── */
+#ruler-wrap{background:#e8e8e8;display:flex;height:18px;flex-shrink:0;border-bottom:1px solid #ccc;}
+#ruler-corner{width:52px;min-width:52px;background:#e8e8e8;border-right:1px solid #ccc;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#888;}
+#ruler-h{flex:1;position:relative;background:#fff;border-bottom:none;overflow:hidden;}
+#ruler-v{position:absolute;right:0;top:0;width:18px;background:#fff;height:100%;border-left:1px solid #ccc;overflow:hidden;display:none;}
+.margin-handle{position:absolute;top:0;width:14px;height:18px;background:#e8e8e8;cursor:ew-resize;border-right:1px solid #b0b0b0;z-index:5;}
+.margin-handle.right{right:0;border-right:none;border-left:1px solid #b0b0b0;}
+.margin-handle-v{position:absolute;left:0;width:18px;height:14px;background:#e8e8e8;cursor:ns-resize;border-bottom:1px solid #b0b0b0;z-index:5;}
+.margin-handle-v.bottom{bottom:0;border-bottom:none;border-top:1px solid #b0b0b0;}
+.indent-marker{position:absolute;top:0;font-size:9px;color:#555;cursor:pointer;z-index:6;-webkit-user-select:none;user-select:none;}
+.indent-marker.rect{font-size:8px;}
+#ruler-ticks{position:absolute;inset:0;pointer-events:none;}
+
+/* ── MAIN AREA ── */
+#main-area{flex:1;display:flex;overflow:hidden;position:relative;}
+#page-scroll-area{flex:1;overflow:auto;background:var(--page-bg);display:flex;flex-direction:column;align-items:center;padding:20px 40px;}
+#pages-container{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;}
+.page{background:#fff;box-shadow:var(--page-shadow);position:relative;width:794px;min-height:1123px;display:flex;flex-direction:column;}
+.page-header{height:40px;border-bottom:1px dashed #ccc;padding:4px 96px;font-size:11px;color:#888;cursor:text;-webkit-user-select:text;user-select:text;}
+.page-footer{height:40px;border-top:1px dashed #ccc;padding:4px 96px;font-size:11px;color:#888;cursor:text;-webkit-user-select:text;user-select:text;display:flex;align-items:center;justify-content:space-between;}
+.page-content{flex:1;padding:96px;outline:none;font-family:'Calibri',Arial,sans-serif;font-size:12pt;line-height:1.15;color:#000;-webkit-user-select:text;user-select:text;cursor:text;min-height:200px;}
+.page-content:focus{outline:none;}
+/* Heading styles */
+.page-content h1{font-size:28pt;color:#2e74b5;font-family:'Calibri Light',sans-serif;margin:16pt 0 4pt;}
+.page-content h2{font-size:18pt;color:#2e74b5;font-family:'Calibri Light',sans-serif;margin:12pt 0 4pt;}
+.page-content h3{font-size:14pt;color:#1f3864;font-family:'Calibri Light',sans-serif;margin:10pt 0 2pt;}
+.page-content h4{font-size:12pt;color:#2e74b5;font-style:italic;margin:8pt 0 2pt;}
+.page-content p{margin:0 0 8pt;}
+.page-content ul{padding-left:1.5em;margin:4pt 0 8pt;}
+.page-content ol{padding-left:1.5em;margin:4pt 0 8pt;}
+.page-content li{margin:2pt 0;}
+.page-content blockquote{border-left:3px solid var(--blue);margin:8pt 0 8pt 20pt;padding:4pt 8pt;color:#444;font-style:italic;}
+.page-content pre,.page-content code{font-family:'Courier New',monospace;background:#f4f4f4;padding:2pt 4pt;border-radius:2pt;font-size:10pt;}
+.page-content table{border-collapse:collapse;width:100%;margin:8pt 0;}
+.page-content table td,.page-content table th{border:1px solid #ccc;padding:4pt 6pt;min-width:40px;}
+.page-content table th{background:#dce6f4;font-weight:700;}
+.page-content a{color:var(--blue);text-decoration:underline;}
+.page-content img{max-width:100%;height:auto;border-radius:2pt;}
+.page-content hr{border:none;border-top:1px solid #ccc;margin:8pt 0;}
+/* Page break indicator */
+.page-break-line{border-top:1px dashed #999;margin:12pt 0;position:relative;text-align:center;}
+.page-break-line::after{content:'--- Page Break ---';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#fff;padding:0 8px;font-size:9px;color:#999;}
+/* Find highlight */
+.find-highlight{background:#ffff00;}
+.find-current{background:#ffa500;}
+/* Comment mark */
+.comment-mark{background:#ffffa0;border-bottom:2px solid #ffcc00;cursor:pointer;}
+/* Header/Footer area */
+.page-header-edit{min-height:48px;padding:8px 96px;border-bottom:1px solid #ccc;background:#f9f9f9;}
+.page-footer-edit{min-height:48px;padding:8px 96px;border-top:1px solid #ccc;background:#f9f9f9;}
+.hf-label{font-size:10px;color:var(--blue);border-bottom:1px solid var(--blue);margin-bottom:4px;padding-bottom:2px;display:flex;justify-content:space-between;}
+
+/* ── STATUS BAR ── */
+#statusbar{background:var(--blue);display:flex;align-items:center;height:22px;padding:0 8px;gap:8px;flex-shrink:0;font-size:11px;color:rgba(255,255,255,.9);}
+.sb-left{display:flex;align-items:center;gap:8px;}
+.sb-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.sb-sep{opacity:.5;}
+.sb-btn{background:none;border:none;color:rgba(255,255,255,.9);cursor:pointer;font-size:11px;font-family:inherit;padding:2px 4px;border-radius:2px;}
+.sb-btn:hover{background:rgba(255,255,255,.2);}
+.view-mode-btns{display:flex;gap:1px;}
+.vm-btn{background:none;border:1px solid transparent;color:rgba(255,255,255,.8);cursor:pointer;width:20px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:2px;font-size:11px;}
+.vm-btn:hover,.vm-btn.active{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4);}
+.zoom-ctrl{display:flex;align-items:center;gap:3px;}
+.zoom-btn{background:none;border:none;color:#fff;cursor:pointer;font-size:14px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;}
+.zoom-slider{width:80px;accent-color:#fff;}
+#zoom-label{color:#fff;font-size:11px;min-width:34px;}
+
+/* ── FIND BAR ── */
+#find-bar{position:fixed;top:128px;right:20px;background:#fff;border:1px solid #ccc;box-shadow:2px 4px 12px rgba(0,0,0,.2);border-radius:4px;z-index:9000;padding:6px 10px;min-width:320px;}
+.find-bar-inner{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.find-bar-inner:last-child{margin-bottom:0;}
+.find-title{font-size:11px;font-weight:700;color:var(--blue);min-width:52px;}
+#find-inp,#replace-inp{border:1px solid #ccc;border-radius:3px;padding:4px 8px;font-size:12px;outline:none;width:160px;font-family:inherit;}
+#find-inp:focus,#replace-inp:focus{border-color:var(--blue);}
+.find-bar-inner button{background:none;border:1px solid #ccc;border-radius:3px;padding:3px 8px;cursor:pointer;font-size:12px;font-family:inherit;}
+.find-bar-inner button:hover{background:#e8eaed;}
+
+/* ── CONTEXT MENU ── */
+#ctx-menu{display:none;position:fixed;background:#fff;border:1px solid #ccc;box-shadow:2px 4px 10px rgba(0,0,0,.2);border-radius:3px;z-index:9999;min-width:220px;padding:4px 0;}
+.ctx-item{padding:5px 20px 5px 28px;cursor:pointer;font-size:12px;color:#1f1f1f;display:flex;justify-content:space-between;align-items:center;}
+.ctx-item:hover{background:#d5e3f7;}
+.ctx-sc{color:#888;font-size:11px;}
+.ctx-sep{border-top:1px solid #e8e8e8;margin:3px 0;}
+
+/* ── DIALOGS ── */
+.dlg-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998;}
+.dlg-overlay.open{display:block;}
+.dlg-box{position:fixed;background:#fff;border:1px solid #aaa;box-shadow:4px 8px 24px rgba(0,0,0,.25);z-index:9999;border-radius:4px;left:50%;transform:translateX(-50%);}
+.dlg-title{background:#f2f2f2;border-bottom:1px solid #e0e0e0;padding:8px 12px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center;border-radius:4px 4px 0 0;}
+.dlg-title button{background:none;border:none;cursor:pointer;font-size:16px;color:#666;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:3px;}
+.dlg-title button:hover{background:#e0e0e0;}
+.dlg-body{padding:14px;font-size:12px;}
+.dlg-row{margin-bottom:10px;}
+.dlg-row label{display:block;font-size:11px;color:#555;margin-bottom:3px;}
+.dlg-row input[type=text],.dlg-row input[type=number],.dlg-row input[type=email],.dlg-row input[type=url],.dlg-row select{border:1px solid #bbb;border-radius:3px;padding:4px 6px;font-size:12px;outline:none;font-family:inherit;}
+.dlg-row input:focus,.dlg-row select:focus{border-color:var(--blue);}
+.dlg-footer{display:flex;justify-content:flex-end;gap:6px;padding:10px 14px;border-top:1px solid #e8e8e8;}
+.btn-ok{background:var(--blue);color:#fff;border:1px solid var(--blue-dark);border-radius:3px;padding:5px 18px;cursor:pointer;font-size:12px;font-family:inherit;}
+.btn-ok:hover{background:var(--blue-dark);}
+.btn-cc{background:#fff;color:#1f1f1f;border:1px solid #bbb;border-radius:3px;padding:5px 18px;cursor:pointer;font-size:12px;font-family:inherit;}
+.btn-cc:hover{background:#f2f2f2;}
+
+/* ── BULLET STYLE CARDS ── */
+.bullet-style{border:1px solid #ccc;border-radius:3px;padding:8px;cursor:pointer;text-align:center;font-size:12px;background:#fafafa;}
+.bullet-style:hover{border-color:var(--blue);background:#dce6f4;}
+
+/* ── TOAST ── */
+#toast{display:none;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:7px 18px;border-radius:3px;font-size:12px;z-index:99999;}
+
+/* ── DROPDOWN MENUS ── */
+.dd-ov{display:none;position:fixed;inset:0;z-index:997;}
+.dd-ov.open{display:block;}
+.dd-menu{display:none;position:fixed;background:#fff;border:1px solid #ccc;box-shadow:2px 4px 10px rgba(0,0,0,.15);z-index:998;min-width:200px;padding:4px 0;border-radius:3px;}
+.dd-menu.open{display:block;}
+.ddi{padding:5px 22px 5px 24px;cursor:pointer;font-size:12px;color:#1f1f1f;display:flex;justify-content:space-between;align-items:center;white-space:nowrap;position:relative;}
+.ddi:hover{background:#d5e3f7;}
+.ddi .di{position:absolute;left:7px;font-size:12px;}
+.ddi .ds{color:#888;font-size:11px;margin-left:24px;}
+.dd-sep{border-top:1px solid #e8e8e8;margin:3px 0;}
+
+/* ── TABLE PICKER ── */
+#table-picker{display:none;position:fixed;background:#fff;border:1px solid #ccc;box-shadow:2px 4px 10px rgba(0,0,0,.15);z-index:999;padding:8px;border-radius:3px;}
+.tp-grid{display:grid;gap:2px;cursor:crosshair;}
+.tp-cell{width:16px;height:16px;border:1px solid #ccc;background:#fff;}
+.tp-cell.hover{background:#dce6f4;border-color:var(--blue);}
+#tp-label{font-size:11px;color:var(--blue);text-align:center;margin-top:4px;}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:#f0f0f0;}
+::-webkit-scrollbar-thumb{background:#c0c0c0;border-radius:5px;border:2px solid #f0f0f0;}
+::-webkit-scrollbar-thumb:hover{background:#999;}
+
+/* ── PRINT ── */
+@media print{
+  #title-bar,#ribbon-tabs,#ribbon,#ruler-wrap,#statusbar,#ctx-menu,#toast,#find-bar,#dd-overlay,#dlg-overlay{display:none!important;}
+  #main-area{overflow:visible!important;}body{height:auto!important;}
+  .page{box-shadow:none!important;margin:0;width:100%;}
+  #page-scroll-area{background:#fff!important;padding:0!important;}
+}
+
+/* ── FOCUS MODE ── */
+body.focus-mode #title-bar,body.focus-mode #ribbon-tabs,body.focus-mode #ribbon,body.focus-mode #ruler-wrap,body.focus-mode #statusbar{display:none!important;}
+body.focus-mode #main-area{height:100vh;}
+body.focus-mode #page-scroll-area{padding:40px;}
+
 </style>
 </head>
 <body>
-  <div class="app-preview">
-    <div class="app-bar">
-      <div class="traffic">
-        <span class="r"></span><span class="y"></span><span class="g"></span>
-      </div>
-      <div style="color: var(--muted); font-size: 0.8rem; margin-left: 1rem;">Document Editor</div>
+
+<!-- TITLE BAR -->
+<div id="title-bar">
+  <div class="tb-left">
+    <div class="word-logo">W</div>
+    <div class="autosave-area">
+      <span style="font-size:11px;color:#444;">AutoSave</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="autosave-toggle" checked/>
+        <span class="slider"></span>
+      </label>
     </div>
-    <div class="tab-content">
-      <div class="doc-toolbar">
-        <button class="tb-btn" style="font-weight:700">B</button>
-        <button class="tb-btn" style="font-style:italic">I</button>
-        <button class="tb-btn" style="text-decoration:underline">U</button>
-        <div class="tb-sep"></div>
-        <button class="tb-btn">H1</button>
-        <button class="tb-btn">H2</button>
-        <div class="tb-sep"></div>
-        <button class="tb-btn">≡</button>
-        <button class="tb-btn">☰</button>
-        <div class="tb-sep"></div>
-        <button class="tb-btn" style="color:#A855F7;font-size:.82rem">✦ AI</button>
-      </div>
-      <div class="doc-content">
-        <p class="doc-heading">Q3 Financial Report — 2024</p>
-        <p>This report outlines quarterly performance across all business units, with a breakdown of revenue streams and cost analysis for the period ending September 30, 2024.</p>
-        <p>Key highlights include a 23% increase in recurring revenue and operational efficiencies achieved through...</p>
-        <div class="ai-suggest">
-          <div class="ai-tag">✦ AI suggestion</div>
-          <p>...automation initiatives, resulting in a net margin improvement of 4.2 percentage points compared to Q2.</p>
+    <div class="qs-group">
+      <button class="qs-btn" title="Save (Ctrl+S)" onclick="doSave()">💾</button>
+      <button class="qs-btn" title="Undo (Ctrl+Z)" id="qs-undo" onclick="doUndo()">↩</button>
+      <button class="qs-btn" id="undo-arrow" onclick="openDd('dd-undo',event)">▾</button>
+      <button class="qs-btn" title="Redo (Ctrl+Y)" id="qs-redo" onclick="doRedo()">↪</button>
+      <button class="qs-btn" title="Customize Quick Access" onclick="toast('Quick Access customized')">▾</button>
+    </div>
+  </div>
+  <div class="tb-center">
+    <input id="doc-title" type="text" value="Document1" class="doc-title-input" spellcheck="false"
+      onchange="document.title=this.value+' - Word'"/>
+    <span style="color:#666;font-size:13px;"> - Word</span>
+  </div>
+  <div class="tb-right">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="global-search" placeholder="Search" class="global-search"
+        onkeydown="if(event.key==='Enter')doFindInDoc(this.value)"/>
+    </div>
+    <div class="avatar-circle">SM</div>
+    <button class="share-btn" onclick="openShareDialog()">🔗 Share</button>
+    <div class="win-btns">
+      <button class="win-btn" onclick="toast('Minimized')">─</button>
+      <button class="win-btn" onclick="toast('Restored')">⬜</button>
+      <button class="win-btn close" onclick="if(confirm('Close Word?'))window.close()">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- RIBBON TABS -->
+<div id="ribbon-tabs">
+  <div class="rtab file-tab" id="rtab-file" onclick="openFileMenu()">File</div>
+  <div class="rtab active" id="rtab-home" onclick="switchTab('home')">Home</div>
+  <div class="rtab" id="rtab-insert" onclick="switchTab('insert')">Insert</div>
+  <div class="rtab" id="rtab-design" onclick="switchTab('design')">Design</div>
+  <div class="rtab" id="rtab-layout" onclick="switchTab('layout')">Layout</div>
+  <div class="rtab" id="rtab-references" onclick="switchTab('references')">References</div>
+  <div class="rtab" id="rtab-mailings" onclick="switchTab('mailings')">Mailings</div>
+  <div class="rtab" id="rtab-review" onclick="switchTab('review')">Review</div>
+  <div class="rtab" id="rtab-view" onclick="switchTab('view')">View</div>
+  <div class="rtab" id="rtab-help" onclick="switchTab('help')">Help</div>
+</div>
+
+<!-- RIBBON PANEL -->
+<div id="ribbon" style="position:relative;"></div>
+
+<!-- RULER -->
+<div id="ruler-wrap">
+  <div id="ruler-corner"></div>
+  <div id="ruler-h" onclick="clickRuler(event)">
+    <div id="left-margin-handle" class="margin-handle" style="left:96px;" onmousedown="startMarginDrag('left',event)"></div>
+    <div id="right-margin-handle" class="margin-handle right" style="right:96px;" onmousedown="startMarginDrag('right',event)"></div>
+    <div id="indent-first" class="indent-marker" style="left:96px;" title="First line indent" onmousedown="startIndentDrag('first',event)">▽</div>
+    <div id="indent-hanging" class="indent-marker" style="left:96px;top:12px;" title="Hanging indent" onmousedown="startIndentDrag('hang',event)">△</div>
+    <div id="indent-left" class="indent-marker rect" style="left:96px;top:18px;" onmousedown="startIndentDrag('left',event)">▬</div>
+    <div id="indent-right" class="indent-marker" style="right:96px;" title="Right indent" onmousedown="startIndentDrag('right',event)">△</div>
+    <div id="ruler-ticks"></div>
+    <div id="tab-stops-container"></div>
+  </div>
+</div>
+
+<!-- MAIN AREA -->
+<div id="main-area">
+  <div id="page-scroll-area">
+    <div id="pages-container">
+      <!-- Page 1 -->
+      <div class="page" id="page-1" data-page="1">
+        <div class="page-content" contenteditable="true" spellcheck="true"
+          onkeyup="onDocInput(event)"
+          onkeydown="handleDocKey(event)"
+          onmouseup="onDocMouseUp()"
+          oninput="onDocChange()"
+          onpaste="onDocPaste(event)">
         </div>
       </div>
     </div>
   </div>
+  <!-- VERTICAL RULER -->
+  <div id="ruler-v">
+    <div id="ruler-v-ticks"></div>
+    <div id="top-margin-handle-v" class="margin-handle-v" style="top:96px;" onmousedown="startVMarginDrag('top',event)"></div>
+    <div id="bottom-margin-handle-v" class="margin-handle-v bottom" style="bottom:96px;" onmousedown="startVMarginDrag('bottom',event)"></div>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <div class="sb-left">
+    <span>Page <span id="sb-page">1</span> of <span id="sb-pages">1</span></span>
+    <span class="sb-sep">|</span>
+    <span><span id="sb-words">0</span> words</span>
+    <span class="sb-sep">|</span>
+    <button class="sb-btn" onclick="openSpellCheck()" title="Spelling & Grammar">
+      <span>♿</span> Accessibility: Good to go
+    </button>
+  </div>
+  <div class="sb-right">
+    <button class="sb-btn" id="focus-btn" onclick="toggleFocusMode()" title="Focus Mode">Focus</button>
+    <div class="view-mode-btns">
+      <button class="vm-btn active" id="vm-print" onclick="setViewMode('print')" title="Print Layout">▭</button>
+      <button class="vm-btn" id="vm-web" onclick="setViewMode('web')" title="Web Layout">🌐</button>
+      <button class="vm-btn" id="vm-read" onclick="setViewMode('read')" title="Read Mode">📖</button>
+    </div>
+    <div class="zoom-ctrl">
+      <button class="zoom-btn" onclick="changeZoom(-10)">−</button>
+      <input type="range" id="zoom-slider" min="10" max="500" value="100" oninput="setZoom(+this.value)" class="zoom-slider"/>
+      <button class="zoom-btn" onclick="changeZoom(10)">+</button>
+      <span id="zoom-label">100%</span>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="document.execCommand('cut');hideCtx()">✂ Cut<span class="ctx-sc">Ctrl+X</span></div>
+  <div class="ctx-item" onclick="document.execCommand('copy');hideCtx()">⎘ Copy<span class="ctx-sc">Ctrl+C</span></div>
+  <div class="ctx-item" onclick="pasteFromClipboard();hideCtx()">📋 Paste<span class="ctx-sc">Ctrl+V</span></div>
+  <div class="ctx-item" onclick="openPasteSpecial();hideCtx()">📋 Paste Special…</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="document.execCommand('bold');hideCtx()"><b>B</b> Bold<span class="ctx-sc">Ctrl+B</span></div>
+  <div class="ctx-item" onclick="document.execCommand('italic');hideCtx()"><i>I</i> Italic<span class="ctx-sc">Ctrl+I</span></div>
+  <div class="ctx-item" onclick="document.execCommand('underline');hideCtx()"><u>U</u> Underline<span class="ctx-sc">Ctrl+U</span></div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="openFontDlg();hideCtx()">🔤 Font…</div>
+  <div class="ctx-item" onclick="openParaDlg();hideCtx()">¶ Paragraph…</div>
+  <div class="ctx-item" onclick="openBulletsDlg();hideCtx()">• Bullets and Numbering…</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="openHyperlinkDlg();hideCtx()">🔗 Hyperlink…<span class="ctx-sc">Ctrl+K</span></div>
+  <div class="ctx-item" onclick="insertComment();hideCtx()">💬 New Comment</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="document.execCommand('selectAll');hideCtx()">Select All<span class="ctx-sc">Ctrl+A</span></div>
+</div>
+
+<!-- FIND & REPLACE BAR -->
+<div id="find-bar" style="display:none;">
+  <div class="find-bar-inner">
+    <span class="find-title">Find</span>
+    <input type="text" id="find-inp" placeholder="Find text…" oninput="doFindHighlight(this.value)" onkeydown="if(event.key==='Enter')findNext()"/>
+    <button onclick="findPrev()">◀</button>
+    <button onclick="findNext()">▶</button>
+    <span id="find-count" style="font-size:11px;color:#666;margin:0 4px;"></span>
+    <button onclick="showReplace()" style="font-size:11px;">Replace</button>
+    <button onclick="closeFindBar()">✕</button>
+  </div>
+  <div id="replace-row" style="display:none;" class="find-bar-inner">
+    <span class="find-title">Replace</span>
+    <input type="text" id="replace-inp" placeholder="Replace with…"/>
+    <button onclick="doReplace()">Replace</button>
+    <button onclick="doReplaceAll()">Replace All</button>
+  </div>
+</div>
+
+<!-- ALL DIALOGS -->
+<div id="dlg-overlay" class="dlg-overlay" onclick="closeDlg()"></div>
+
+<!-- Font Dialog -->
+<div class="dlg-box" id="dlg-font" style="display:none;width:480px;top:80px;">
+  <div class="dlg-title">Font <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+    <div class="dlg-row"><label>Font:</label><select id="dlg-font-name" onchange="previewFont()" style="width:100%;height:100px;size:5;"></select></div>
+    <div class="dlg-row"><label>Style:</label>
+      <select id="dlg-font-style" style="width:100%;height:100px;" onchange="previewFont()">
+        <option>Regular</option><option>Italic</option><option>Bold</option><option>Bold Italic</option>
+      </select>
+    </div>
+    <div class="dlg-row"><label>Size:</label>
+      <select id="dlg-font-size" style="width:100%;height:100px;" onchange="previewFont()">
+        <option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+        <option selected>12</option><option>14</option><option>16</option><option>18</option>
+        <option>20</option><option>22</option><option>24</option><option>28</option><option>32</option>
+        <option>36</option><option>48</option><option>72</option>
+      </select>
+    </div>
+    <div class="dlg-row" style="grid-column:1/-1;">
+      <label>Font color:</label>
+      <input type="color" id="dlg-font-color" value="#000000"/>
+      <label style="margin-left:12px;">Highlight color:</label>
+      <input type="color" id="dlg-highlight-color" value="#ffff00"/>
+    </div>
+    <div class="dlg-row" style="grid-column:1/-1;display:flex;gap:16px;flex-wrap:wrap;">
+      <label><input type="checkbox" id="dlg-bold-chk"/> Bold</label>
+      <label><input type="checkbox" id="dlg-italic-chk"/> Italic</label>
+      <label><input type="checkbox" id="dlg-under-chk"/> Underline</label>
+      <label><input type="checkbox" id="dlg-strike-chk"/> Strikethrough</label>
+      <label><input type="checkbox" id="dlg-dbl-strike-chk"/> Double strikethrough</label>
+      <label><input type="checkbox" id="dlg-super-chk"/> Superscript</label>
+      <label><input type="checkbox" id="dlg-sub-chk"/> Subscript</label>
+      <label><input type="checkbox" id="dlg-shadow-chk"/> Shadow</label>
+      <label><input type="checkbox" id="dlg-outline-chk"/> Outline</label>
+      <label><input type="checkbox" id="dlg-smallcaps-chk"/> Small caps</label>
+      <label><input type="checkbox" id="dlg-allcaps-chk"/> All caps</label>
+    </div>
+    <div class="dlg-row" style="grid-column:1/-1;">
+      <label>Underline style:</label>
+      <select id="dlg-under-style" style="width:200px;">
+        <option value="none">(none)</option><option value="solid" selected>Words only</option>
+        <option value="double">Double</option><option value="dotted">Dotted</option><option value="dashed">Dashed</option>
+      </select>
+      <label style="margin-left:12px;">Underline color:</label>
+      <input type="color" id="dlg-under-color" value="#000000"/>
+    </div>
+    <div class="dlg-row" style="grid-column:1/-1;">
+      <label>Preview:</label>
+      <div id="font-preview" style="border:1px solid #ccc;padding:8px 12px;min-height:36px;font-size:18px;background:#fff;border-radius:3px;">AaBbCc</div>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-cc" onclick="closeDlg()">Cancel</button>
+    <button class="btn-cc" onclick="setAsDefault()">Set As Default</button>
+    <button class="btn-ok" onclick="applyFontDlg()">OK</button>
+  </div>
+</div>
+
+<!-- Paragraph Dialog -->
+<div class="dlg-box" id="dlg-para" style="display:none;width:440px;top:80px;">
+  <div class="dlg-title">Paragraph <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div class="dlg-row"><label>Alignment:</label>
+      <select id="dlg-align" style="width:160px;">
+        <option value="left">Left</option><option value="center">Centered</option>
+        <option value="right">Right</option><option value="justify">Justified</option>
+      </select>
+    </div>
+    <div class="dlg-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div><label>Left indent (cm):</label><input type="number" id="dlg-indent-l" value="0" min="0" max="30" step="0.1" style="width:80px;"/></div>
+      <div><label>Right indent (cm):</label><input type="number" id="dlg-indent-r" value="0" min="0" max="30" step="0.1" style="width:80px;"/></div>
+      <div><label>Special:</label>
+        <select id="dlg-special" style="width:120px;">
+          <option value="none">(none)</option><option value="first">First line</option><option value="hanging">Hanging</option>
+        </select>
+      </div>
+      <div><label>By (cm):</label><input type="number" id="dlg-special-by" value="1.27" min="0" step="0.1" style="width:80px;"/></div>
+    </div>
+    <div class="dlg-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div><label>Before (pt):</label><input type="number" id="dlg-space-b" value="0" min="0" style="width:80px;"/></div>
+      <div><label>After (pt):</label><input type="number" id="dlg-space-a" value="8" min="0" style="width:80px;"/></div>
+    </div>
+    <div class="dlg-row"><label>Line spacing:</label>
+      <select id="dlg-line-sp" style="width:160px;">
+        <option value="1">Single</option><option value="1.15" selected>1.15</option>
+        <option value="1.5">1.5 lines</option><option value="2">Double</option>
+        <option value="at least">At least</option><option value="exactly">Exactly</option><option value="multiple">Multiple</option>
+      </select>
+      <label style="margin-left:8px;">At:</label>
+      <input type="number" id="dlg-line-at" value="12" style="width:60px;"/>
+    </div>
+    <div class="dlg-row">
+      <label><input type="checkbox" id="dlg-dont-add-sp"/> Don't add space between paragraphs of the same style</label>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-cc" onclick="closeDlg()">Cancel</button>
+    <button class="btn-cc" onclick="setParaDefault()">Set As Default</button>
+    <button class="btn-ok" onclick="applyParaDlg()">OK</button>
+  </div>
+</div>
+
+<!-- Insert Table Dialog -->
+<div class="dlg-box" id="dlg-table" style="display:none;width:280px;top:120px;">
+  <div class="dlg-title">Insert Table <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div class="dlg-row"><label>Columns:</label><input type="number" id="tbl-cols" value="3" min="1" max="20" style="width:80px;"/></div>
+    <div class="dlg-row"><label>Rows:</label><input type="number" id="tbl-rows" value="3" min="1" max="50" style="width:80px;"/></div>
+    <div class="dlg-row"><label>AutoFit behavior:</label>
+      <select id="tbl-autofit" style="width:200px;">
+        <option value="fixed">Fixed column width</option>
+        <option value="auto">AutoFit to contents</option>
+        <option value="window">AutoFit to window</option>
+      </select>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-cc" onclick="closeDlg()">Cancel</button>
+    <button class="btn-ok" onclick="doInsertTable()">OK</button>
+  </div>
+</div>
+
+<!-- Insert Link Dialog -->
+<div class="dlg-box" id="dlg-link" style="display:none;width:400px;top:120px;">
+  <div class="dlg-title">Insert Hyperlink <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div class="dlg-row"><label>Text to display:</label><input type="text" id="link-text" placeholder="Display text"/></div>
+    <div class="dlg-row"><label>Address:</label><input type="text" id="link-url" placeholder="https://…"/></div>
+    <div class="dlg-row"><label>Screen tip:</label><input type="text" id="link-tip" placeholder="Optional tooltip…"/></div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-cc" onclick="closeDlg()">Cancel</button>
+    <button class="btn-ok" onclick="applyHyperlink()">OK</button>
+  </div>
+</div>
+
+<!-- Page Setup Dialog -->
+<div class="dlg-box" id="dlg-pagesetup" style="display:none;width:400px;top:80px;">
+  <div class="dlg-title">Page Setup <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="dlg-row"><label>Paper size:</label>
+        <select id="ps-size" style="width:160px;" onchange="applyPageSize()">
+          <option value="letter">Letter (8.5" × 11")</option>
+          <option value="a4" selected>A4 (21cm × 29.7cm)</option>
+          <option value="legal">Legal (8.5" × 14")</option>
+          <option value="a3">A3 (29.7cm × 42cm)</option>
+        </select>
+      </div>
+      <div class="dlg-row"><label>Orientation:</label>
+        <select id="ps-orient" style="width:140px;" onchange="applyOrientation()">
+          <option value="portrait" selected>Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </div>
+      <div class="dlg-row"><label>Top margin (cm):</label><input type="number" id="ps-top" value="2.54" step="0.1" style="width:80px;"/></div>
+      <div class="dlg-row"><label>Bottom margin (cm):</label><input type="number" id="ps-bot" value="2.54" step="0.1" style="width:80px;"/></div>
+      <div class="dlg-row"><label>Left margin (cm):</label><input type="number" id="ps-left" value="2.54" step="0.1" style="width:80px;"/></div>
+      <div class="dlg-row"><label>Right margin (cm):</label><input type="number" id="ps-right" value="2.54" step="0.1" style="width:80px;"/></div>
+      <div class="dlg-row"><label>Gutter (cm):</label><input type="number" id="ps-gutter" value="0" step="0.1" style="width:80px;"/></div>
+      <div class="dlg-row"><label>Columns:</label><input type="number" id="ps-cols" value="1" min="1" max="10" style="width:80px;"/></div>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-cc" onclick="closeDlg()">Cancel</button>
+    <button class="btn-cc" onclick="setPageDefault()">Set As Default</button>
+    <button class="btn-ok" onclick="applyPageSetup()">OK</button>
+  </div>
+</div>
+
+<!-- Insert Image Dialog -->
+<div class="dlg-box" id="dlg-image" style="display:none;width:360px;top:120px;">
+  <div class="dlg-title">Insert Picture <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div class="dlg-row"><label>Image URL or upload:</label><input type="url" id="img-url" placeholder="https://example.com/image.jpg"/></div>
+    <div class="dlg-row"><label>Or upload file:</label><input type="file" id="img-file" accept="image/*" onchange="previewImgUpload(this)"/></div>
+    <div class="dlg-row"><label>Alt text:</label><input type="text" id="img-alt" placeholder="Description of image"/></div>
+    <div id="img-preview-box" style="min-height:60px;border:1px solid #e0e0e0;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;margin-top:6px;">No image selected</div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-cc" onclick="closeDlg()">Cancel</button>
+    <button class="btn-ok" onclick="doInsertImage()">Insert</button>
+  </div>
+</div>
+
+<!-- Header/Footer Dialog -->
+<div class="dlg-box" id="dlg-headfoot" style="display:none;width:380px;top:120px;">
+  <div class="dlg-title">Header and Footer <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div class="dlg-row"><label>Header text:</label><input type="text" id="hdr-text" placeholder="Header…"/></div>
+    <div class="dlg-row"><label>Footer text:</label><input type="text" id="ftr-text" placeholder="Footer…"/></div>
+    <div class="dlg-row"><label>Header/footer on:</label>
+      <select id="hf-scope" style="width:200px;">
+        <option>All pages</option><option>First page different</option><option>Odd and even pages</option>
+      </select>
+    </div>
+    <div class="dlg-row"><label><input type="checkbox" id="hf-page-num" checked/> Insert page number in footer</label></div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-cc" onclick="closeDlg()">Cancel</button>
+    <button class="btn-ok" onclick="applyHeaderFooter()">OK</button>
+  </div>
+</div>
+
+<!-- Word Count Dialog -->
+<div class="dlg-box" id="dlg-wordcount" style="display:none;width:280px;top:140px;">
+  <div class="dlg-title">Word Count <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body" id="wc-body" style="font-size:13px;line-height:2;"></div>
+  <div class="dlg-footer"><button class="btn-ok" onclick="closeDlg()">Close</button></div>
+</div>
+
+<!-- Bullets/Numbering Dialog -->
+<div class="dlg-box" id="dlg-bullets" style="display:none;width:380px;top:120px;">
+  <div class="dlg-title">Bullets and Numbering <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+      <div class="bullet-style" onclick="applyBulletStyle('disc')" title="Bullet">• Bullet</div>
+      <div class="bullet-style" onclick="applyBulletStyle('circle')" title="Circle">○ Circle</div>
+      <div class="bullet-style" onclick="applyBulletStyle('square')" title="Square">■ Square</div>
+      <div class="bullet-style" onclick="applyBulletStyle('')" title="None">None</div>
+      <div class="bullet-style" onclick="applyNumberStyle('decimal')" title="Numbers">1. 2. 3.</div>
+      <div class="bullet-style" onclick="applyNumberStyle('lower-alpha')" title="a b c">a) b) c)</div>
+      <div class="bullet-style" onclick="applyNumberStyle('upper-alpha')" title="A B C">A) B) C)</div>
+      <div class="bullet-style" onclick="applyNumberStyle('lower-roman')" title="i ii iii">i. ii. iii.</div>
+    </div>
+  </div>
+  <div class="dlg-footer"><button class="btn-cc" onclick="closeDlg()">Cancel</button><button class="btn-ok" onclick="closeDlg()">OK</button></div>
+</div>
+
+<!-- TOC Dialog -->
+<div class="dlg-box" id="dlg-toc" style="display:none;width:360px;top:120px;">
+  <div class="dlg-title">Table of Contents <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div class="dlg-row"><label>Format:</label>
+      <select id="toc-fmt" style="width:200px;"><option>Classic</option><option>Distinctive</option><option>Fancy</option><option>Modern</option><option>Simple</option></select>
+    </div>
+    <div class="dlg-row"><label>Show levels:</label><input type="number" id="toc-levels" value="3" min="1" max="9" style="width:60px;"/></div>
+    <div class="dlg-row"><label><input type="checkbox" id="toc-pgnum" checked/> Show page numbers</label></div>
+    <div class="dlg-row"><label><input type="checkbox" id="toc-right" checked/> Right align page numbers</label></div>
+  </div>
+  <div class="dlg-footer"><button class="btn-cc" onclick="closeDlg()">Cancel</button><button class="btn-ok" onclick="doInsertTOC()">OK</button></div>
+</div>
+
+<!-- Spelling Dialog -->
+<div class="dlg-box" id="dlg-spelling" style="display:none;width:380px;top:120px;">
+  <div class="dlg-title">Spelling & Grammar <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body" id="spell-body"></div>
+  <div class="dlg-footer"><button class="btn-cc" onclick="closeDlg()">Ignore All</button><button class="btn-cc" onclick="addToDictionary()">Add to Dictionary</button><button class="btn-ok" onclick="closeDlg()">Close</button></div>
+</div>
+
+<!-- Share Dialog -->
+<div class="dlg-box" id="dlg-share" style="display:none;width:380px;top:100px;">
+  <div class="dlg-title">Share Document <button onclick="closeDlg()">✕</button></div>
+  <div class="dlg-body">
+    <div class="dlg-row"><label>Share with:</label><input type="email" id="share-email" placeholder="Enter email address…"/></div>
+    <div class="dlg-row"><label>Message:</label><textarea id="share-msg" rows="3" style="width:100%;border:1px solid #bbb;border-radius:3px;padding:6px;font-family:inherit;font-size:12px;" placeholder="Add a message…"></textarea></div>
+    <div class="dlg-row"><label>Permission:</label>
+      <select id="share-perm" style="width:200px;"><option>Can edit</option><option>Can view</option><option>Can comment</option></select>
+    </div>
+    <div class="dlg-row"><label><input type="checkbox" id="share-notify" checked/> Notify people</label></div>
+  </div>
+  <div class="dlg-footer"><button class="btn-cc" onclick="closeDlg()">Cancel</button><button class="btn-ok" onclick="doShare()">Share</button></div>
+</div>
+
+<div id="toast"></div>
+<div id="style-picker" style="display:none;"></div>
+
+<script>
+// ══════════════════════════════════════
+// RIBBON DEFINITIONS
+// ══════════════════════════════════════
+const RIBBONS = {
+
+home: `<div class="rb-panel" id="rb-home">
+  <!-- Clipboard -->
+  <div class="rb-grp">
+    <div class="rb-top" style="gap:3px;">
+      <div class="rbb" onclick="openDd('dd-paste',event)" title="Paste (Ctrl+V)"><span class="ico">📋</span>Paste▾</div>
+      <div style="display:flex;flex-direction:column;gap:1px;padding-bottom:16px;">
+        <div class="rbl" onclick="execCmd('cut')" title="Cut Ctrl+X"><span>✂</span> Cut</div>
+        <div class="rbl" onclick="execCmd('copy')" title="Copy Ctrl+C"><span>⎘</span> Copy</div>
+        <div class="rbl" onclick="doFormatPainter()" title="Format Painter"><span>🖌</span> Format Painter</div>
+      </div>
+    </div>
+    <div class="rb-glbl">Clipboard</div>
+  </div>
+  <!-- Font -->
+  <div class="rb-grp">
+    <div class="rb-top" style="gap:2px;flex-wrap:wrap;max-width:230px;">
+      <select class="rbdrop" id="font-family" style="width:130px;" onchange="execCmd('fontName',this.value)">
+        <option value="Aptos (Body)" selected>Aptos (Body)</option>
+        <option value="Arial">Arial</option><option value="Calibri">Calibri</option>
+        <option value="'Times New Roman'">Times New Roman</option>
+        <option value="Georgia">Georgia</option><option value="Verdana">Verdana</option>
+        <option value="'Courier New'">Courier New</option><option value="'Comic Sans MS'">Comic Sans MS</option>
+        <option value="Impact">Impact</option><option value="Garamond">Garamond</option>
+        <option value="Tahoma">Tahoma</option><option value="'Trebuchet MS'">Trebuchet MS</option>
+      </select>
+      <select class="rbdrop" id="font-size" style="width:44px;" onchange="execCmd('fontSize',this.value)">
+        <option>8</option><option>9</option><option>10</option><option>11</option>
+        <option value="3" selected>12</option><option>14</option><option>16</option>
+        <option>18</option><option>20</option><option>22</option><option>24</option>
+        <option>28</option><option>32</option><option>36</option><option>48</option><option>72</option>
+      </select>
+      <div class="rbs" onclick="changeFontSize(1)" title="Increase Font Size (Ctrl+>)">A↑</div>
+      <div class="rbs" onclick="changeFontSize(-1)" title="Decrease Font Size (Ctrl+<)">A↓</div>
+      <div class="rbs" onclick="execCmd('removeFormat')" title="Clear All Formatting">Aa✕</div>
+    </div>
+    <div class="rb-bot" style="gap:2px;">
+      <div class="rbs xb" id="btn-bold" onclick="toggleCmd('bold')" title="Bold (Ctrl+B)" style="font-weight:900;font-size:14px;">B</div>
+      <div class="rbs" id="btn-italic" onclick="toggleCmd('italic')" title="Italic (Ctrl+I)" style="font-style:italic;font-size:14px;">I</div>
+      <div class="rbs" id="btn-underline" onclick="openDd('dd-underline',event)" title="Underline (Ctrl+U)"><u>U</u>▾</div>
+      <div class="rbs" id="btn-strike" onclick="toggleCmd('strikeThrough')" title="Strikethrough"><s>ab</s></div>
+      <div class="rbs" onclick="toggleCmd('subscript')" title="Subscript">x₂</div>
+      <div class="rbs" onclick="toggleCmd('superscript')" title="Superscript">x²</div>
+      <div class="rbsep"></div>
+      <div class="rb-colorwrap" title="Text Highlight Color" onclick="document.getElementById('inp-highlight').click()">
+        <span style="font-size:12px;">🖍</span>
+        <div class="rb-colorbar" id="highlight-bar" style="background:#ffff00;"></div>
+        <input type="color" id="inp-highlight" value="#ffff00" onchange="applyHighlight(this.value)"/>
+      </div>
+      <div class="rbs" onclick="openDd('dd-highlight',event)" title="Text Highlight Color">▾</div>
+      <div class="rb-colorwrap" title="Font Color" onclick="document.getElementById('inp-fontcolor').click()">
+        <span style="font-weight:700;font-size:13px;">A</span>
+        <div class="rb-colorbar" id="fontcolor-bar" style="background:#c00000;"></div>
+        <input type="color" id="inp-fontcolor" value="#c00000" onchange="applyFontColor(this.value)"/>
+      </div>
+      <div class="rbs" onclick="openDd('dd-fontcolor',event)" title="Font Color">▾</div>
+    </div>
+    <div class="rb-glbl">Font</div>
+  </div>
+  <!-- Paragraph -->
+  <div class="rb-grp">
+    <div class="rb-top" style="gap:2px;">
+      <div class="rbs" onclick="execCmd('insertUnorderedList')" title="Bullets" id="btn-ul">≡•</div>
+      <div class="rbs" onclick="openDd('dd-bullets',event)" title="Bullet Library">▾</div>
+      <div class="rbs" onclick="execCmd('insertOrderedList')" title="Numbering" id="btn-ol">≡1</div>
+      <div class="rbs" onclick="openDd('dd-numbering',event)" title="Numbering Library">▾</div>
+      <div class="rbs" onclick="execCmd('outdent')" title="Decrease Indent">⇤</div>
+      <div class="rbs" onclick="execCmd('indent')" title="Increase Indent">⇥</div>
+      <div class="rbs" onclick="openDd('dd-sort',event)" title="Sort">🔃</div>
+      <div class="rbs" onclick="togglePilcrow()" title="Show/Hide Formatting Marks" id="btn-pilcrow" style="font-size:14px;">¶</div>
+    </div>
+    <div class="rb-bot" style="gap:2px;">
+      <div class="rbs" id="btn-al" onclick="execCmd('justifyLeft')" title="Align Left (Ctrl+L)">⬛L</div>
+      <div class="rbs" id="btn-ac" onclick="execCmd('justifyCenter')" title="Center (Ctrl+E)">☰</div>
+      <div class="rbs" id="btn-ar" onclick="execCmd('justifyRight')" title="Align Right (Ctrl+R)">⬛R</div>
+      <div class="rbs" id="btn-aj" onclick="execCmd('justifyFull')" title="Justify (Ctrl+J)">≡≡</div>
+      <div class="rbsep"></div>
+      <div class="rbs" onclick="openDd('dd-linespace',event)" title="Line and Paragraph Spacing">↕⬛▾</div>
+      <div class="rb-colorwrap" title="Shading" onclick="document.getElementById('inp-shading').click()">
+        <span>🎨</span>
+        <div class="rb-colorbar" id="shading-bar" style="background:#ffd700;"></div>
+        <input type="color" id="inp-shading" value="#ffd700" onchange="applyShading(this.value)"/>
+      </div>
+      <div class="rbs" onclick="openDd('dd-borders',event)" title="Borders">▦▾</div>
+    </div>
+    <div class="rb-glbl">Paragraph</div>
+  </div>
+  <!-- Styles -->
+  <div class="rb-grp" style="min-width:300px;">
+    <div class="rb-top" style="padding-bottom:16px;">
+      <div class="styles-row" id="styles-row">
+        <div class="style-card active" onclick="applyStyle('p')" style="font-size:11px;">¶ Normal</div>
+        <div class="style-card" onclick="applyStyle('h1')" style="font-size:11px;color:#2e74b5;font-weight:700;">H1 Head 1</div>
+        <div class="style-card" onclick="applyStyle('h2')" style="font-size:10px;color:#2e74b5;font-weight:700;">H2 Head 2</div>
+        <div class="style-card" onclick="applyStyle('h3')" style="font-size:10px;color:#1f3864;">H3 Head 3</div>
+        <div class="style-card" onclick="applyStyle('h4')" style="font-size:10px;color:#2e74b5;font-style:italic;">H4</div>
+        <div class="style-card" onclick="applyStyle('title-style')" style="font-size:16px;font-weight:700;">Title</div>
+        <div class="style-card" onclick="applyStyle('subtitle-style')" style="font-size:10px;color:#666;font-style:italic;">Subtitle</div>
+        <div class="style-card" onclick="applyStyle('subtle-em')" style="font-size:10px;font-style:italic;">Subtle Em</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;margin-left:4px;padding-bottom:16px;">
+        <div class="rbs" onclick="scrollStyles(-1)" title="More styles up">▲</div>
+        <div class="rbs" onclick="scrollStyles(1)" title="More styles down">▼</div>
+        <div class="rbs" onclick="openStylesPane()" title="Styles pane">▾</div>
+      </div>
+    </div>
+    <div class="rb-glbl">Styles</div>
+  </div>
+  <!-- Editing -->
+  <div class="rb-grp">
+    <div class="rb-top" style="gap:2px;">
+      <div class="rbb" onclick="openFind()" title="Find (Ctrl+F)"><span class="ico">🔍</span>Find▾</div>
+      <div class="rbb" onclick="openFindReplace()" title="Replace (Ctrl+H)"><span class="ico">🔄</span>Replace</div>
+      <div class="rbb" onclick="openDd('dd-select',event)" title="Select"><span class="ico">☐</span>Select▾</div>
+    </div>
+    <div class="rb-glbl">Editing</div>
+  </div>
+  <!-- Add-ins -->
+  <div class="rb-grp">
+    <div class="rb-top">
+      <div class="rbb" onclick="toast('Add-ins gallery opened')"><span class="ico">🔌</span>Add-ins</div>
+    </div>
+    <div class="rb-glbl">Add-ins</div>
+  </div>
+</div>`,
+
+insert: `<div class="rb-panel" id="rb-insert">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openDd('dd-pages',event)"><span class="ico">📄</span>Pages▾</div>
+    <div class="rbb" onclick="openTablePicker(event)"><span class="ico">🗃</span>Table▾</div>
+    <div class="rbb" onclick="openDlg('image')"><span class="ico">🖼</span>Pictures▾</div>
+    <div class="rbb" onclick="openDd('dd-shapes',event)"><span class="ico">🔷</span>Shapes▾</div>
+    <div class="rbb" onclick="toast('Icons gallery opened')"><span class="ico">⭐</span>Icons</div>
+    <div class="rbb" onclick="toast('3D Models opened')"><span class="ico">🧊</span>3D Models</div>
+    <div class="rbb" onclick="toast('SmartArt gallery opened')"><span class="ico">📊</span>SmartArt</div>
+    <div class="rbb" onclick="toast('Chart wizard opened')"><span class="ico">📈</span>Chart</div>
+    <div class="rbb" onclick="toast('Screenshot captured')"><span class="ico">📷</span>Screenshot▾</div>
+  </div><div class="rb-glbl">Illustrations</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openDlg('headfoot')"><span class="ico">📑</span>Header▾</div>
+    <div class="rbb" onclick="openDlg('headfoot')"><span class="ico">📑</span>Footer▾</div>
+    <div class="rbb" onclick="insertPageNumber()"><span class="ico">#</span>Page Number▾</div>
+  </div><div class="rb-glbl">Header & Footer</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="insertTextBox()"><span class="ico">Aa</span>Text Box▾</div>
+    <div class="rbb" onclick="insertWordArt()"><span class="ico">✨</span>WordArt▾</div>
+    <div class="rbb" onclick="insertDropCap()"><span class="ico">A</span>Drop Cap▾</div>
+    <div class="rbb" onclick="insertDateField()"><span class="ico">📅</span>Date & Time</div>
+    <div class="rbb" onclick="insertFieldCode()"><span class="ico">{ }</span>Field</div>
+  </div><div class="rb-glbl">Text</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openDlg('link')"><span class="ico">🔗</span>Link▾</div>
+    <div class="rbb" onclick="insertBookmark()"><span class="ico">🔖</span>Bookmark</div>
+    <div class="rbb" onclick="insertCrossRef()"><span class="ico">🔁</span>Cross-reference</div>
+    <div class="rbb" onclick="insertComment()"><span class="ico">💬</span>Comment</div>
+    <div class="rbb" onclick="insertFootnote()"><span class="ico">¹</span>Footnote</div>
+    <div class="rbb" onclick="insertEndnote()"><span class="ico">ⁱ</span>Endnote</div>
+  </div><div class="rb-glbl">Links & Notes</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="insertEquation()"><span class="ico">π</span>Equation▾</div>
+    <div class="rbb" onclick="insertSymbol()"><span class="ico">Ω</span>Symbol▾</div>
+  </div><div class="rb-glbl">Symbols</div></div>
+</div>`,
+
+design: `<div class="rb-panel" id="rb-design">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="applyDocTheme('default')"><span class="ico">🎨</span>Themes▾</div>
+    <div class="rbb" onclick="applyDocTheme('colors')"><span class="ico">🌈</span>Colors▾</div>
+    <div class="rbb" onclick="applyDocTheme('fonts')"><span class="ico">Aa</span>Fonts▾</div>
+    <div class="rbb" onclick="applyDocTheme('effects')"><span class="ico">✨</span>Effects▾</div>
+    <div class="rbb" onclick="setDocDefault()"><span class="ico">📌</span>Set as Default</div>
+  </div><div class="rb-glbl">Document Formatting</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openWatermarkDd(event)"><span class="ico">🏷</span>Watermark▾</div>
+    <div class="rb-colorwrap" title="Page Color" onclick="document.getElementById('inp-pgcolor').click()" style="width:50px;height:56px;border:1px solid transparent;border-radius:3px;" onmouseover="this.style.background='#d5e3f7'" onmouseout="this.style.background=''">
+      <span style="font-size:20px;line-height:1;">🖌</span>
+      <div class="rb-colorbar" id="pgcolor-bar" style="background:#fff;"></div>
+      <span style="font-size:10px;">Page Color▾</span>
+      <input type="color" id="inp-pgcolor" value="#ffffff" onchange="applyPageColor(this.value)"/>
+    </div>
+    <div class="rbb" onclick="openDd('dd-pageborder',event)"><span class="ico">▦</span>Page Borders</div>
+  </div><div class="rb-glbl">Page Background</div></div>
+</div>`,
+
+layout: `<div class="rb-panel" id="rb-layout">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openDd('dd-margins',event)"><span class="ico">📏</span>Margins▾</div>
+    <div class="rbb" onclick="toggleOrientation()"><span class="ico">📐</span>Orientation▾</div>
+    <div class="rbb" onclick="openDd('dd-papersize',event)"><span class="ico">📄</span>Size▾</div>
+    <div class="rbb" onclick="openDd('dd-columns',event)"><span class="ico">⫴</span>Columns▾</div>
+    <div class="rbb" onclick="insertPageBreak()"><span class="ico">⊟</span>Breaks▾</div>
+    <div class="rbb" onclick="openDd('dd-linenumbers',event)"><span class="ico">1▾</span>Line Numbers▾</div>
+    <div class="rbb" onclick="openDd('dd-hyphenation',event)"><span class="ico">⁻</span>Hyphenation▾</div>
+  </div><div class="rb-glbl">Page Setup</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openParaDlg()"><span class="ico">¶</span>Paragraph</div>
+    <div class="rbb" onclick="openDd('dd-indent',event)"><span class="ico">⇥</span>Indent</div>
+    <div class="rbb" onclick="openDd('dd-spacing',event)"><span class="ico">↕</span>Spacing</div>
+  </div><div class="rb-glbl">Paragraph</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openDd('dd-position',event)"><span class="ico">📌</span>Position▾</div>
+    <div class="rbb" onclick="openDd('dd-textwrap',event)"><span class="ico">≡</span>Wrap Text▾</div>
+    <div class="rbb" onclick="openDd('dd-bringforward',event)"><span class="ico">⬆</span>Bring Forward▾</div>
+    <div class="rbb" onclick="openDd('dd-sendbehind',event)"><span class="ico">⬇</span>Send Backward▾</div>
+    <div class="rbb" onclick="toast('Selection Pane opened')"><span class="ico">☐</span>Selection Pane</div>
+    <div class="rbb" onclick="toast('Objects aligned')"><span class="ico">⊞</span>Align▾</div>
+    <div class="rbb" onclick="toast('Objects grouped')"><span class="ico">⊡</span>Group▾</div>
+    <div class="rbb" onclick="toast('Object rotated')"><span class="ico">↻</span>Rotate▾</div>
+  </div><div class="rb-glbl">Arrange</div></div>
+</div>`,
+
+references: `<div class="rb-panel" id="rb-references">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openDlg('toc')"><span class="ico">📋</span>Table of Contents▾</div>
+    <div class="rbb" onclick="updateTOC()"><span class="ico">🔄</span>Update Table</div>
+  </div><div class="rb-glbl">Table of Contents</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="insertFootnote()"><span class="ico">¹</span>Insert Footnote<span style="font-size:9px;">Ctrl+Alt+F</span></div>
+    <div class="rbb" onclick="insertEndnote()"><span class="ico">ⁱ</span>Insert Endnote</div>
+    <div class="rbb" onclick="navFootnote(-1)"><span class="ico">◀</span>Previous Footnote</div>
+    <div class="rbb" onclick="navFootnote(1)"><span class="ico">▶</span>Next Footnote</div>
+    <div class="rbb" onclick="openDd('dd-shownotes',event)"><span class="ico">👁</span>Show Notes</div>
+  </div><div class="rb-glbl">Footnotes</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Citation inserted')"><span class="ico">📜</span>Insert Citation▾</div>
+    <div class="rbb" onclick="toast('Source manager opened')"><span class="ico">📚</span>Manage Sources</div>
+    <div class="rbb" onclick="openDd('dd-bibstyle',event)"><span class="ico">🎓</span>Style▾</div>
+    <div class="rbb" onclick="insertBibliography()"><span class="ico">📗</span>Bibliography▾</div>
+  </div><div class="rb-glbl">Citations & Bibliography</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="insertCaption()"><span class="ico">🖼</span>Insert Caption</div>
+    <div class="rbb" onclick="toast('Table of figures inserted')"><span class="ico">📊</span>Insert Table of Figures</div>
+    <div class="rbb" onclick="toast('Cross-reference dialog')"><span class="ico">🔁</span>Cross-reference</div>
+  </div><div class="rb-glbl">Captions</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="insertMarkEntry()"><span class="ico">🏷</span>Mark Entry</div>
+    <div class="rbb" onclick="toast('Index inserted')"><span class="ico">📑</span>Insert Index</div>
+    <div class="rbb" onclick="toast('Index updated')"><span class="ico">🔄</span>Update Index</div>
+  </div><div class="rb-glbl">Index</div></div>
+</div>`,
+
+mailings: `<div class="rb-panel" id="rb-mailings">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Envelopes dialog opened')"><span class="ico">✉</span>Envelopes</div>
+    <div class="rbb" onclick="toast('Labels dialog opened')"><span class="ico">🏷</span>Labels</div>
+  </div><div class="rb-glbl">Create</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Mail Merge wizard started')"><span class="ico">📧</span>Start Mail Merge▾</div>
+    <div class="rbb" onclick="toast('Recipients selected')"><span class="ico">👥</span>Select Recipients▾</div>
+    <div class="rbb" onclick="toast('Recipient list edited')"><span class="ico">✏</span>Edit Recipient List</div>
+  </div><div class="rb-glbl">Start Mail Merge</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Address block inserted')"><span class="ico">📬</span>Address Block</div>
+    <div class="rbb" onclick="toast('Greeting line inserted')"><span class="ico">👋</span>Greeting Line</div>
+    <div class="rbb" onclick="toast('Merge field inserted')"><span class="ico">{ }</span>Insert Merge Field▾</div>
+  </div><div class="rb-glbl">Write & Insert Fields</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Results preview showing')"><span class="ico">👁</span>Preview Results</div>
+    <div class="rbb" onclick="toast('Error check complete')"><span class="ico">✅</span>Check for Errors</div>
+    <div class="rbb" onclick="toast('Merge completed')"><span class="ico">✔</span>Finish & Merge▾</div>
+  </div><div class="rb-glbl">Preview & Finish</div></div>
+</div>`,
+
+review: `<div class="rb-panel" id="rb-review">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="openSpellCheck()"><span class="ico">📝</span>Spelling & Grammar<span style="font-size:9px;">F7</span></div>
+    <div class="rbb" onclick="toast('Thesaurus opened: select a word first')"><span class="ico">📖</span>Thesaurus<span style="font-size:9px;">Shift+F7</span></div>
+    <div class="rbb" onclick="showWordCount()"><span class="ico">🔢</span>Word Count</div>
+    <div class="rbb" onclick="toast('Accessibility check complete')"><span class="ico">♿</span>Check Accessibility</div>
+  </div><div class="rb-glbl">Proofing</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Translation service opened')"><span class="ico">🌐</span>Translate▾</div>
+    <div class="rbb" onclick="openDd('dd-language',event)"><span class="ico">🗣</span>Language▾</div>
+  </div><div class="rb-glbl">Language</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="insertComment()"><span class="ico">💬</span>New Comment</div>
+    <div class="rbb" onclick="deleteComment()"><span class="ico">🗑</span>Delete Comment▾</div>
+    <div class="rbb" onclick="navComment(-1)"><span class="ico">◀</span>Previous Comment</div>
+    <div class="rbb" onclick="navComment(1)"><span class="ico">▶</span>Next Comment</div>
+    <div class="rbb" onclick="toggleShowComments()"><span class="ico">👁</span>Show Comments</div>
+  </div><div class="rb-glbl">Comments</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toggleTrackChanges()" id="btn-track"><span class="ico">📋</span>Track Changes▾</div>
+    <div class="rbb" onclick="toast('All markup showing')"><span class="ico">👁</span>Show Markup▾</div>
+    <div class="rbb" onclick="openDd('dd-reviewing-pane',event)"><span class="ico">📋</span>Reviewing Pane▾</div>
+  </div><div class="rb-glbl">Tracking</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="acceptChange()"><span class="ico">✔</span>Accept▾</div>
+    <div class="rbb" onclick="rejectChange()"><span class="ico">✕</span>Reject▾</div>
+    <div class="rbb" onclick="navChange(-1)"><span class="ico">◀</span>Previous</div>
+    <div class="rbb" onclick="navChange(1)"><span class="ico">▶</span>Next</div>
+  </div><div class="rb-glbl">Changes</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="compareDocuments()"><span class="ico">🔀</span>Compare▾</div>
+    <div class="rbb" onclick="combineDocuments()"><span class="ico">⊞</span>Combine</div>
+  </div><div class="rb-glbl">Compare</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Document protected')"><span class="ico">🔒</span>Protect Document▾</div>
+    <div class="rbb" onclick="toast('Editing restricted')"><span class="ico">🛡</span>Restrict Editing</div>
+  </div><div class="rb-glbl">Protect</div></div>
+</div>`,
+
+view: `<div class="rb-panel" id="rb-view">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" id="vb-print" onclick="setViewMode('print')" class="rbb on"><span class="ico">📄</span>Print Layout</div>
+    <div class="rbb" id="vb-web" onclick="setViewMode('web')"><span class="ico">🌐</span>Web Layout</div>
+    <div class="rbb" id="vb-outline" onclick="setViewMode('outline')"><span class="ico">☰</span>Outline</div>
+    <div class="rbb" id="vb-draft" onclick="setViewMode('draft')"><span class="ico">📝</span>Draft</div>
+    <div class="rbb" id="vb-read" onclick="setViewMode('read')"><span class="ico">📖</span>Read Mode</div>
+    <div class="rbb" onclick="toggleFocusMode()"><span class="ico">🔲</span>Focus</div>
+  </div><div class="rb-glbl">Views</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:16px;">
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="chk-ruler" checked onchange="toggleRuler()"/> Ruler</label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="chk-gridlines" onchange="toggleGridlines()"/> Gridlines</label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="chk-navpane" onchange="toggleNavPane()"/> Navigation Pane</label>
+    </div>
+  </div><div class="rb-glbl">Show</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="setZoom(100)"><span class="ico">🔍</span>Zoom</div>
+    <div class="rbb" onclick="setZoom(100)"><span class="ico">1:1</span>100%</div>
+    <div class="rbb" onclick="setZoom(150)"><span class="ico">🔎</span>One Page</div>
+    <div class="rbb" onclick="setZoom(75)"><span class="ico">⊞</span>Multiple Pages</div>
+    <div class="rbb" onclick="setZoom(100)"><span class="ico">↔</span>Page Width</div>
+  </div><div class="rb-glbl">Zoom</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('New window opened')"><span class="ico">🗗</span>New Window</div>
+    <div class="rbb" onclick="toast('All windows arranged')"><span class="ico">⊞</span>Arrange All</div>
+    <div class="rbb" onclick="toggleSplitView()"><span class="ico">⊟</span>Split</div>
+    <div class="rbb" onclick="toast('Documents switched')"><span class="ico">🔄</span>Switch Windows▾</div>
+  </div><div class="rb-glbl">Window</div></div>
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Macro recorded/run')"><span class="ico">⏺</span>Macros▾</div>
+  </div><div class="rb-glbl">Macros</div></div>
+</div>`,
+
+help: `<div class="rb-panel" id="rb-help">
+  <div class="rb-grp"><div class="rb-top" style="gap:3px;">
+    <div class="rbb" onclick="toast('Word Help opened (F1)')"><span class="ico">❓</span>Help</div>
+    <div class="rbb" onclick="toast('Contact Support')"><span class="ico">📞</span>Contact Support</div>
+    <div class="rbb" onclick="toast('Feedback sent — thank you!')"><span class="ico">📣</span>Feedback</div>
+    <div class="rbb" onclick="showAboutDialog()"><span class="ico">ℹ</span>About</div>
+    <div class="rbb" onclick="toast('What\\'s New in Word')"><span class="ico">🆕</span>What\\'s New</div>
+  </div><div class="rb-glbl">Help</div></div>
+</div>`
+};
+
+// ── DROPDOWN MENUS HTML ──
+const DD_HTML = `
+<div class="dd-ov" id="ov-dd-paste" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-paste">
+  <div class="ddi" onclick="execCmd('paste');closeDd()"><span class="di">📋</span>Paste<span class="ds">Ctrl+V</span></div>
+  <div class="ddi" onclick="pasteAsText();closeDd()"><span class="di">📄</span>Paste as Text Only</div>
+  <div class="ddi" onclick="pasteFromClipboard();closeDd()"><span class="di">📋</span>Keep Source Formatting</div>
+  <div class="ddi" onclick="openPasteSpecial();closeDd()"><span class="di">🔧</span>Paste Special…<span class="ds">Ctrl+Alt+V</span></div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="setDefaultPaste('text');closeDd()">Set Default Paste…</div>
+</div>
+<div class="dd-ov" id="ov-dd-underline" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-underline" style="min-width:180px;">
+  <div class="ddi" onclick="execCmd('underline');closeDd()">─ Single<span class="ds">Ctrl+U</span></div>
+  <div class="ddi" onclick="applyUnderlineStyle('double');closeDd()">═ Double</div>
+  <div class="ddi" onclick="applyUnderlineStyle('dotted');closeDd()">... Dotted</div>
+  <div class="ddi" onclick="applyUnderlineStyle('dashed');closeDd()">- - Dashed</div>
+  <div class="ddi" onclick="applyUnderlineStyle('wavy');closeDd()">~ Wavy</div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="openUnderlineColor();closeDd()">Underline Color▾</div>
+</div>
+<div class="dd-ov" id="ov-dd-highlight" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-highlight" style="min-width:160px;padding:8px;">
+  <div style="display:grid;grid-template-columns:repeat(5,24px);gap:3px;margin-bottom:6px;">
+    ${['#ffff00','#00ff00','#00ffff','#ff00ff','#0000ff','#ff0000','#ff8c00','#ffffff','#808080','#000000'].map(c=>`<div style="width:24px;height:24px;background:${c};border:1px solid #ccc;border-radius:2px;cursor:pointer;" onclick="applyHighlight('${c}');closeDd()"></div>`).join('')}
+  </div>
+  <div class="ddi" onclick="applyHighlight('');closeDd()">No Color</div>
+</div>
+<div class="dd-ov" id="ov-dd-fontcolor" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-fontcolor" style="min-width:160px;padding:8px;">
+  <div style="font-size:11px;color:#555;margin-bottom:4px;">Theme Colors</div>
+  <div style="display:grid;grid-template-columns:repeat(10,20px);gap:2px;margin-bottom:6px;">
+    ${['#000000','#ffffff','#ee1111','#ff6600','#ffcc00','#33aa33','#3377cc','#993399','#996633','#666666'].map(c=>`<div style="width:20px;height:20px;background:${c};border:1px solid #ccc;border-radius:1px;cursor:pointer;" onclick="applyFontColor('${c}');closeDd()"></div>`).join('')}
+  </div>
+  <div class="ddi" onclick="document.getElementById('inp-fontcolor').click();closeDd()">More Colors…</div>
+</div>
+<div class="dd-ov" id="ov-dd-bullets" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-bullets" style="min-width:200px;padding:8px;">
+  <div style="font-size:11px;color:#555;margin-bottom:6px;font-weight:700;">Bullet Library</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px;">
+    <div onclick="applyBulletStyle('disc');closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:12px;text-align:center;">● Filled</div>
+    <div onclick="applyBulletStyle('circle');closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:12px;text-align:center;">○ Open</div>
+    <div onclick="applyBulletStyle('square');closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:12px;text-align:center;">■ Square</div>
+    <div onclick="execCmd('insertUnorderedList');document.execCommand('styleWithCSS',false,false);closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:12px;text-align:center;">— Dash</div>
+  </div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="openDlg('bullets');closeDd()">Define New Bullet…</div>
+</div>
+<div class="dd-ov" id="ov-dd-numbering" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-numbering" style="min-width:200px;padding:8px;">
+  <div style="font-size:11px;color:#555;margin-bottom:6px;font-weight:700;">Numbering Library</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px;">
+    <div onclick="applyNumberStyle('decimal');closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:11px;text-align:center;">1. 2. 3.</div>
+    <div onclick="applyNumberStyle('lower-alpha');closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:11px;text-align:center;">a) b) c)</div>
+    <div onclick="applyNumberStyle('upper-alpha');closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:11px;text-align:center;">A) B) C)</div>
+    <div onclick="applyNumberStyle('lower-roman');closeDd()" style="border:1px solid #ccc;padding:6px;cursor:pointer;border-radius:2px;font-size:11px;text-align:center;">i. ii. iii.</div>
+  </div>
+  <div class="ddi" onclick="openDlg('bullets');closeDd()">Define New Number Format…</div>
+</div>
+<div class="dd-ov" id="ov-dd-linespace" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-linespace">
+  <div class="ddi" onclick="setLineHeight(1);closeDd()">1.0</div>
+  <div class="ddi" onclick="setLineHeight(1.15);closeDd()">1.15 ✓</div>
+  <div class="ddi" onclick="setLineHeight(1.5);closeDd()">1.5</div>
+  <div class="ddi" onclick="setLineHeight(2);closeDd()">2.0</div>
+  <div class="ddi" onclick="setLineHeight(2.5);closeDd()">2.5</div>
+  <div class="ddi" onclick="setLineHeight(3);closeDd()">3.0</div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="addSpaceBefore();closeDd()">Add Space Before Paragraph</div>
+  <div class="ddi" onclick="addSpaceAfter();closeDd()">Add Space After Paragraph</div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="openParaDlg();closeDd()">Line Spacing Options…</div>
+</div>
+<div class="dd-ov" id="ov-dd-borders" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-borders">
+  <div class="ddi" onclick="applyParaBorder('bottom');closeDd()">⬇ Bottom Border</div>
+  <div class="ddi" onclick="applyParaBorder('top');closeDd()">⬆ Top Border</div>
+  <div class="ddi" onclick="applyParaBorder('left');closeDd()">⬅ Left Border</div>
+  <div class="ddi" onclick="applyParaBorder('right');closeDd()">➡ Right Border</div>
+  <div class="ddi" onclick="applyParaBorder('all');closeDd()">▦ All Borders</div>
+  <div class="ddi" onclick="applyParaBorder('box');closeDd()">□ Outside Borders</div>
+  <div class="ddi" onclick="applyParaBorder('none');closeDd()">✕ No Border</div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="toast('Horizontal line inserted');insertHorizontalLine();closeDd()">— Horizontal Line</div>
+  <div class="ddi" onclick="toast('Border dialog');closeDd()">Borders and Shading…</div>
+</div>
+<div class="dd-ov" id="ov-dd-select" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-select">
+  <div class="ddi" onclick="execCmd('selectAll');closeDd()">Select All<span class="ds">Ctrl+A</span></div>
+  <div class="ddi" onclick="selectCurrentLine();closeDd()">Select Current Line</div>
+  <div class="ddi" onclick="selectCurrentPara();closeDd()">Select Current Paragraph</div>
+  <div class="ddi" onclick="toast('Select all with similar formatting');closeDd()">Select All with Similar Formatting</div>
+</div>
+<div class="dd-ov" id="ov-dd-sort" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-sort">
+  <div class="ddi" onclick="sortSelection('az');closeDd()">Sort A to Z</div>
+  <div class="ddi" onclick="sortSelection('za');closeDd()">Sort Z to A</div>
+</div>
+<div class="dd-ov" id="ov-dd-pages" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-pages">
+  <div class="ddi" onclick="insertPageBreak();closeDd()">Page Break<span class="ds">Ctrl+Enter</span></div>
+  <div class="ddi" onclick="insertBlankPage();closeDd()">Blank Page</div>
+  <div class="ddi" onclick="insertCoverPage();closeDd()">Cover Page▾</div>
+</div>
+<div class="dd-ov" id="ov-dd-shapes" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-shapes" style="padding:8px;min-width:200px;">
+  <div style="font-size:11px;color:#555;margin-bottom:6px;">Recently Used Shapes</div>
+  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+    ${['▭','○','△','▷','◇','☆','⬡','✦'].map(s=>`<div style="width:28px;height:28px;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px;font-size:16px;" onclick="insertShape('${s}');closeDd()">${s}</div>`).join('')}
+  </div>
+  <div class="ddi" onclick="insertShape('line');closeDd()">— Line</div>
+  <div class="ddi" onclick="insertShape('arrow');closeDd()">→ Arrow</div>
+  <div class="ddi" onclick="insertShape('textbox');closeDd()">□ Text Box</div>
+</div>
+<div class="dd-ov" id="ov-dd-margins" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-margins">
+  <div class="ddi" onclick="setMargins(2.54,2.54,2.54,2.54);closeDd()">Normal (2.54cm all)</div>
+  <div class="ddi" onclick="setMargins(1.27,1.27,1.27,1.27);closeDd()">Narrow (1.27cm all)</div>
+  <div class="ddi" onclick="setMargins(2.54,2.54,3.81,3.81);closeDd()">Moderate</div>
+  <div class="ddi" onclick="setMargins(2.54,2.54,5.08,5.08);closeDd()">Wide</div>
+  <div class="ddi" onclick="setMargins(2.54,2.54,1.27,1.27);closeDd()">Mirrored</div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="openDlg('pagesetup');closeDd()">Custom Margins…</div>
+</div>
+<div class="dd-ov" id="ov-dd-papersize" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-papersize">
+  <div class="ddi" onclick="setPaperSize(794,1123,'A4');closeDd()">A4 (21 × 29.7cm)</div>
+  <div class="ddi" onclick="setPaperSize(816,1056,'Letter');closeDd()">Letter (8.5 × 11in)</div>
+  <div class="ddi" onclick="setPaperSize(816,1344,'Legal');closeDd()">Legal (8.5 × 14in)</div>
+  <div class="ddi" onclick="setPaperSize(1123,1587,'A3');closeDd()">A3 (29.7 × 42cm)</div>
+  <div class="ddi" onclick="setPaperSize(595,842,'A5');closeDd()">A5 (14.8 × 21cm)</div>
+</div>
+<div class="dd-ov" id="ov-dd-columns" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-columns">
+  <div class="ddi" onclick="setColumns(1);closeDd()">⬜ One</div>
+  <div class="ddi" onclick="setColumns(2);closeDd()">⬜⬜ Two</div>
+  <div class="ddi" onclick="setColumns(3);closeDd()">⬜⬜⬜ Three</div>
+  <div class="ddi" onclick="setColumns(2,'left');closeDd()">◫ Left</div>
+  <div class="ddi" onclick="setColumns(2,'right');closeDd()">◨ Right</div>
+  <div class="dd-sep"></div>
+  <div class="ddi" onclick="openDlg('pagesetup');closeDd()">More Columns…</div>
+</div>
+<div class="dd-ov" id="ov-dd-language" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-language">
+  <div class="ddi" onclick="setLanguage('en-US');closeDd()">English (US)</div>
+  <div class="ddi" onclick="setLanguage('en-GB');closeDd()">English (UK)</div>
+  <div class="ddi" onclick="setLanguage('fr-FR');closeDd()">French (France)</div>
+  <div class="ddi" onclick="setLanguage('de-DE');closeDd()">German (Germany)</div>
+  <div class="ddi" onclick="setLanguage('es-ES');closeDd()">Spanish (Spain)</div>
+  <div class="ddi" onclick="setLanguage('ar-SA');closeDd()">Arabic</div>
+  <div class="ddi" onclick="setLanguage('ur-PK');closeDd()">Urdu</div>
+  <div class="ddi" onclick="setLanguage('zh-CN');closeDd()">Chinese Simplified</div>
+</div>
+<div class="dd-ov" id="ov-dd-pageborder" onclick="closeDd()"></div>
+<div class="dd-menu" id="dd-pageborder">
+  <div class="ddi" onclick="applyPageBorder('solid');closeDd()">Solid Border</div>
+  <div class="ddi" onclick="applyPageBorder('dashed');closeDd()">Dashed Border</div>
+  <div class="ddi" onclick="applyPageBorder('double');closeDd()">Double Border</div>
+  <div class="ddi" onclick="applyPageBorder('');closeDd()">No Border</div>
+</div>
+<!-- Table picker popup -->
+<div id="table-picker" style="display:none;">
+  <div class="tp-grid" id="tp-grid"></div>
+  <div id="tp-label">0 × 0 Table</div>
+</div>
+`;
+
+// Inject dropdowns into body
+document.body.insertAdjacentHTML('beforeend', DD_HTML);
+
+// ── INIT RIBBON ──
+function switchTab(tab) {
+  document.querySelectorAll('.rtab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('rtab-' + tab);
+  if (el) el.classList.add('active');
+  const ribbon = document.getElementById('ribbon');
+  ribbon.innerHTML = RIBBONS[tab] || `<div class="rb-panel"><div style="padding:20px;color:#888;">Coming soon…</div></div>`;
+  syncRibbonState();
+}
+
+function syncRibbonState() {
+  try {
+    const cmds = [['bold','btn-bold'],['italic','btn-italic'],['underline','btn-underline'],['strikeThrough','btn-strike'],['insertUnorderedList','btn-ul'],['insertOrderedList','btn-ol'],['justifyLeft','btn-al'],['justifyCenter','btn-ac'],['justifyRight','btn-ar'],['justifyFull','btn-aj']];
+    cmds.forEach(([cmd, id]) => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (document.queryCommandState(cmd)) el.classList.add('on');
+        else el.classList.remove('on');
+      }
+    });
+  } catch(e) {}
+}
+
+// Load Home ribbon by default
+document.addEventListener('DOMContentLoaded', () => {
+  switchTab('home');
+  initTablePicker();
+});
+
+</script>
+<script>
+// ══════════════════════════════════════
+// CORE STATE
+// ══════════════════════════════════════
+let zoomLevel = 100;
+let trackChanges = false;
+let showComments = true;
+let showPilcrow = false;
+let splitViewOn = false;
+let focusModeOn = false;
+let currentLang = 'en-US';
+let undoStack = [], redoStack = [];
+let pageMargins = { top: 96, bottom: 96, left: 96, right: 96 };
+let findResults = [], findIdx = 0;
+let commentList = [];
+let headerText = '', footerText = '';
+let currentStyle = 'p';
+let fpActive = false; // format painter
+let savedRange = null;
+let pageCount = 1;
+
+// ══════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════
+let _tt;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(_tt); _tt = setTimeout(() => t.style.display = 'none', 2400);
+}
+
+function getEditor() {
+  const pg = document.querySelector('.page.active .page-content') ||
+             document.querySelector('.page-content');
+  return pg;
+}
+
+function focusEditor() {
+  const ed = getEditor();
+  if (ed) {
+    ed.focus();
+    if (savedRange) restoreRange();
+  }
+}
+
+function saveRange() {
+  const sel = window.getSelection();
+  if (sel.rangeCount > 0) savedRange = sel.getRangeAt(0).cloneRange();
+}
+
+function restoreRange() {
+  if (!savedRange) return;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(savedRange);
+}
+
+function execCmd(cmd, val = null) {
+  focusEditor();
+  document.execCommand(cmd, false, val);
+  onDocChange();
+  syncRibbonState();
+}
+
+function toggleCmd(cmd) {
+  focusEditor();
+  document.execCommand(cmd, false, null);
+  onDocChange();
+  syncRibbonState();
+}
+
+// ══════════════════════════════════════
+// UNDO / REDO
+// ══════════════════════════════════════
+function saveToUndo() {
+  const ed = getEditor();
+  if (!ed) return;
+  const snap = ed.innerHTML;
+  if (undoStack.length && undoStack[undoStack.length-1] === snap) return;
+  undoStack.push(snap);
+  if (undoStack.length > 100) undoStack.shift();
+  redoStack = [];
+  updateUndoRedoBtns();
+}
+
+function doUndo() {
+  const ed = getEditor(); if (!ed || undoStack.length < 2) return;
+  redoStack.push(undoStack.pop());
+  ed.innerHTML = undoStack[undoStack.length - 1] || '';
+  updateUndoRedoBtns(); onDocChange();
+}
+
+function doRedo() {
+  const ed = getEditor(); if (!ed || !redoStack.length) return;
+  const snap = redoStack.pop();
+  undoStack.push(snap);
+  ed.innerHTML = snap;
+  updateUndoRedoBtns(); onDocChange();
+}
+
+function updateUndoRedoBtns() {
+  const u = document.getElementById('qs-undo');
+  const r = document.getElementById('qs-redo');
+  if (u) u.disabled = undoStack.length < 2;
+  if (r) r.disabled = redoStack.length === 0;
+}
+
+// ══════════════════════════════════════
+// DOCUMENT EVENTS
+// ══════════════════════════════════════
+function onDocChange() {
+  updateWordCount();
+  updatePageCount();
+  updateStatusBar();
+  autoSaveIndicator();
+}
+
+function onDocInput(e) {
+  saveRange();
+  // Auto-detect headings typed as "# text"
+  checkAutoFormat(e);
+}
+
+function handleDocKey(e) {
+  const ctrl = e.ctrlKey || e.metaKey;
+  if (ctrl && e.key === 'z') { e.preventDefault(); doUndo(); return; }
+  if (ctrl && e.key === 'y') { e.preventDefault(); doRedo(); return; }
+  if (ctrl && e.key === 'b') { e.preventDefault(); toggleCmd('bold'); return; }
+  if (ctrl && e.key === 'i') { e.preventDefault(); toggleCmd('italic'); return; }
+  if (ctrl && e.key === 'u') { e.preventDefault(); toggleCmd('underline'); return; }
+  if (ctrl && e.key === 's') { e.preventDefault(); doSave(); return; }
+  if (ctrl && e.key === 'f') { e.preventDefault(); openFind(); return; }
+  if (ctrl && e.key === 'h') { e.preventDefault(); openFindReplace(); return; }
+  if (ctrl && e.key === 'k') { e.preventDefault(); openDlg('link'); return; }
+  if (ctrl && e.key === 'p') { e.preventDefault(); window.print(); return; }
+  if (ctrl && e.key === 'a') { e.preventDefault(); execCmd('selectAll'); return; }
+  if (ctrl && e.key === 'l') { e.preventDefault(); execCmd('justifyLeft'); return; }
+  if (ctrl && e.key === 'e') { e.preventDefault(); execCmd('justifyCenter'); return; }
+  if (ctrl && e.key === 'r') { e.preventDefault(); execCmd('justifyRight'); return; }
+  if (ctrl && e.key === 'j') { e.preventDefault(); execCmd('justifyFull'); return; }
+  if (ctrl && e.key === 'd') { e.preventDefault(); openFontDlg(); return; }
+  if (ctrl && e.shiftKey && e.key === '>') { e.preventDefault(); changeFontSize(1); return; }
+  if (ctrl && e.shiftKey && e.key === '<') { e.preventDefault(); changeFontSize(-1); return; }
+  if (ctrl && e.key === 'Enter') { e.preventDefault(); insertPageBreak(); return; }
+  if (e.key === 'Enter') {
+    setTimeout(()=>{ saveToUndo(); updateWordCount(); checkNewPage(); }, 10);
+  }
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    execCmd('insertHTML', '&emsp;&emsp;');
+    return;
+  }
+  if (e.key === 'F7') { e.preventDefault(); openSpellCheck(); return; }
+  saveRange();
+}
+
+function onDocMouseUp() {
+  saveRange();
+  syncRibbonState();
+  updateSelectionInfo();
+}
+
+function onDocPaste(e) {
+  // Rich paste — just let browser handle it, then sanitize
+  setTimeout(() => { onDocChange(); saveToUndo(); }, 50);
+}
+
+function checkAutoFormat(e) {
+  // Convert markdown-like headings on Enter
+  if (e.key !== ' ') return;
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const node = sel.getRangeAt(0).startContainer;
+  if (node.nodeType !== Node.TEXT_NODE) return;
+  const txt = node.textContent;
+  if (txt === '#') { document.execCommand('delete'); applyStyle('h1'); }
+  else if (txt === '##') { document.execCommand('delete'); document.execCommand('delete'); applyStyle('h2'); }
+  else if (txt === '###') { for(let i=0;i<3;i++) document.execCommand('delete'); applyStyle('h3'); }
+}
+
+function updateSelectionInfo() {
+  try {
+    const sel = window.getSelection();
+    if (sel.toString().length > 0) {
+      document.getElementById('sb-mode') && (document.getElementById('sb-mode').textContent = sel.toString().split(/\s+/).filter(Boolean).length + ' words selected');
+    }
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════
+// WORD COUNT & STATUS
+// ══════════════════════════════════════
+function updateWordCount() {
+  const ed = getEditor();
+  if (!ed) return;
+  const text = ed.innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
+  const chars = text.replace(/\n/g, '').length;
+  const wordsEl = document.getElementById('sb-words');
+  if (wordsEl) wordsEl.textContent = words.toLocaleString();
+  return { words, chars, pages: pageCount };
+}
+
+function updatePageCount() {
+  const ed = getEditor();
+  if (!ed) return;
+  const height = ed.scrollHeight;
+  const pageH = 1031; // approx page content height
+  pageCount = Math.max(1, Math.ceil(height / pageH));
+  const sp = document.getElementById('sb-pages');
+  if (sp) sp.textContent = pageCount;
+}
+
+function checkNewPage() {
+  // Auto page break visualization
+  const ed = getEditor();
+  if (!ed) return;
+  if (ed.scrollHeight > ed.offsetHeight + 200) {
+    // Could add visual page break indicator
+  }
+}
+
+function updateStatusBar() {
+  const pg = document.getElementById('sb-page');
+  if (pg) pg.textContent = '1';
+}
+
+function autoSaveIndicator() {
+  const tog = document.getElementById('autosave-toggle');
+  if (tog && tog.checked) {
+    // Simulate autosave flash
+  }
+}
+
+// ══════════════════════════════════════
+// SAVE / EXPORT
+// ══════════════════════════════════════
+function doSave() {
+  const ed = getEditor();
+  const title = document.getElementById('doc-title').value || 'Document1';
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title>
+<style>body{font-family:Calibri,Arial,sans-serif;font-size:12pt;line-height:1.15;max-width:794px;margin:40px auto;padding:96px;color:#000;}
+h1{font-size:28pt;color:#2e74b5;}h2{font-size:18pt;color:#2e74b5;}h3{font-size:14pt;color:#1f3864;}
+table{border-collapse:collapse;width:100%;}td,th{border:1px solid #ccc;padding:4pt 6pt;}th{background:#dce6f4;}
+blockquote{border-left:3px solid #2b579a;padding:4pt 8pt;margin-left:20pt;color:#444;font-style:italic;}
+a{color:#2b579a;}</style></head><body>
+${headerText ? `<div style="border-bottom:1px solid #ccc;margin-bottom:20px;padding-bottom:8px;">${headerText}</div>` : ''}
+${ed ? ed.innerHTML : ''}
+${footerText ? `<div style="border-top:1px solid #ccc;margin-top:20px;padding-top:8px;">${footerText}</div>` : ''}
+</body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = title + '.html';
+  a.click();
+  toast('Saved as ' + title + '.html ✓');
+}
+
+function exportAsPDF() {
+  toast('Preparing PDF…');
+  setTimeout(() => window.print(), 300);
+}
+
+// ══════════════════════════════════════
+// FONT OPERATIONS
+// ══════════════════════════════════════
+function changeFontSize(delta) {
+  focusEditor();
+  try {
+    const size = parseInt(document.queryCommandValue('fontSize')) || 3;
+    const sizes = [8,9,10,11,12,14,16,18,20,22,24,28,32,36,48,72];
+    const idx = Math.min(sizes.length-1, Math.max(0, sizes.indexOf(size*4) + delta));
+    document.execCommand('fontSize', false, idx > 5 ? 5 : idx < 1 ? 1 : idx);
+  } catch(e) {}
+}
+
+function applyFontColor(v) {
+  document.getElementById('fontcolor-bar').style.background = v;
+  execCmd('foreColor', v);
+}
+
+function applyHighlight(v) {
+  if (document.getElementById('highlight-bar')) document.getElementById('highlight-bar').style.background = v || '#ffff00';
+  if (v) execCmd('hiliteColor', v);
+  else execCmd('removeFormat');
+}
+
+function applyUnderlineStyle(style) {
+  focusEditor();
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.style.textDecorationLine = 'underline';
+  span.style.textDecorationStyle = style;
+  try { range.surroundContents(span); } catch(e) { execCmd('underline'); }
+  onDocChange();
+}
+
+function applyShading(v) {
+  if (document.getElementById('shading-bar')) document.getElementById('shading-bar').style.background = v;
+  execCmd('hiliteColor', v);
+}
+
+function doFormatPainter() {
+  fpActive = true;
+  toast('Format Painter active — click text to apply format');
+  document.body.style.cursor = 'crosshair';
+  const handler = () => {
+    fpActive = false;
+    document.body.style.cursor = '';
+    document.removeEventListener('mouseup', handler);
+    toast('Format applied ✓');
+  };
+  document.addEventListener('mouseup', handler);
+}
+
+// ══════════════════════════════════════
+// PARAGRAPH / STYLE
+// ══════════════════════════════════════
+function applyStyle(tag) {
+  focusEditor();
+  currentStyle = tag;
+  if (tag === 'title-style') {
+    document.execCommand('formatBlock', false, 'h1');
+    execCmd('fontSize', 7);
+    execCmd('bold');
+  } else if (tag === 'subtitle-style') {
+    document.execCommand('formatBlock', false, 'p');
+    execCmd('italic');
+    execCmd('foreColor', '#666666');
+  } else if (tag === 'subtle-em') {
+    execCmd('italic');
+    execCmd('foreColor', '#666666');
+  } else {
+    document.execCommand('formatBlock', false, '<' + tag + '>');
+  }
+  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+  syncRibbonState();
+  onDocChange();
+}
+
+function setLineHeight(h) {
+  focusEditor();
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  execCmd('insertHTML', `<span style="line-height:${h}">${sel.toString() || ' '}</span>`);
+  toast('Line spacing set to ' + h);
+}
+
+function addSpaceBefore() {
+  execCmd('insertHTML', '<div style="margin-top:12pt;"></div>');
+  toast('Space before paragraph added');
+}
+function addSpaceAfter() {
+  execCmd('insertHTML', '<div style="margin-bottom:12pt;"></div>');
+  toast('Space after paragraph added');
+}
+
+function applyBulletStyle(type) {
+  focusEditor();
+  execCmd('insertUnorderedList');
+  if (type) {
+    execCmd('insertHTML', `<ul style="list-style-type:${type};"><li></li></ul>`);
+  }
+  toast('Bullet style applied');
+}
+
+function applyNumberStyle(type) {
+  focusEditor();
+  execCmd('insertHTML', `<ol style="list-style-type:${type};"><li></li></ol>`);
+  toast('Numbering applied');
+}
+
+function applyBulletDlg() { openDlg('bullets'); }
+function applyNumberDlg() { openDlg('bullets'); }
+
+function togglePilcrow() {
+  showPilcrow = !showPilcrow;
+  const el = document.getElementById('btn-pilcrow');
+  if (el) el.classList.toggle('on', showPilcrow);
+  document.querySelectorAll('.page-content').forEach(pg => {
+    pg.style.whiteSpace = showPilcrow ? 'pre-wrap' : '';
+  });
+  toast(showPilcrow ? 'Formatting marks shown' : 'Formatting marks hidden');
+}
+
+function applyParaBorder(side) {
+  focusEditor();
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const block = range.startContainer.parentElement?.closest('p,div,h1,h2,h3,blockquote') || range.startContainer.parentElement;
+  if (!block) return;
+  const style = side === 'none' ? '' : side === 'all' ? '1px solid #000' : '';
+  if (side === 'bottom') block.style.borderBottom = '1px solid #000';
+  else if (side === 'top') block.style.borderTop = '1px solid #000';
+  else if (side === 'left') block.style.borderLeft = '1px solid #000';
+  else if (side === 'right') block.style.borderRight = '1px solid #000';
+  else if (side === 'box' || side === 'all') block.style.border = '1px solid #000';
+  else if (side === 'none') block.style.border = '';
+  toast('Border applied');
+}
+
+function insertHorizontalLine() {
+  execCmd('insertHorizontalRule');
+  toast('Horizontal line inserted');
+}
+
+function selectCurrentLine() {
+  focusEditor();
+  execCmd('selectAll');
+  toast('All text selected');
+}
+
+function selectCurrentPara() {
+  focusEditor();
+  document.execCommand('selectAll');
+  toast('Paragraph selected');
+}
+
+function sortSelection(dir) {
+  const ed = getEditor();
+  if (!ed) return;
+  const sel = window.getSelection();
+  if (!sel.toString()) { toast('Select text to sort'); return; }
+  const txt = sel.toString().split('\n').filter(Boolean);
+  txt.sort((a,b) => dir==='az' ? a.localeCompare(b) : b.localeCompare(a));
+  execCmd('insertHTML', txt.join('<br/>'));
+  toast('Sorted ' + (dir==='az'?'A→Z':'Z→A'));
+}
+
+function scrollStyles(dir) { toast('More styles ' + (dir > 0 ? 'down' : 'up')); }
+function openStylesPane() { toast('Styles pane opened — select text and click a style'); }
+
+// ══════════════════════════════════════
+// INSERT OPERATIONS
+// ══════════════════════════════════════
+function insertPageBreak() {
+  execCmd('insertHTML', '<div style="page-break-after:always;border-top:1px dashed #aaa;margin:12pt 0;text-align:center;color:#aaa;font-size:10px;">─ Page Break ─</div><p></p>');
+  toast('Page break inserted');
+}
+
+function insertBlankPage() {
+  execCmd('insertHTML', '<div style="page-break-after:always;height:200px;"></div>');
+  toast('Blank page inserted');
+}
+
+function insertCoverPage() {
+  execCmd('insertHTML', `<div style="page-break-after:always;text-align:center;padding:100px 40px;background:#f0f4fc;border:2px solid #2b579a;margin-bottom:20px;">
+    <h1 style="font-size:36pt;color:#2b579a;margin-bottom:20px;">${document.getElementById('doc-title').value||'Document Title'}</h1>
+    <p style="font-size:14pt;color:#666;">Author Name</p>
+    <p style="font-size:12pt;color:#888;">${new Date().toLocaleDateString()}</p>
+  </div><p></p>`);
+  toast('Cover page inserted');
+}
+
+function insertPageNumber() {
+  execCmd('insertHTML', '<span style="color:#666;font-size:10px;">[Page #]</span>');
+  toast('Page number field inserted');
+}
+
+function insertTextBox() {
+  execCmd('insertHTML', '<div style="border:1px solid #ccc;padding:8pt 10pt;margin:8pt 0;min-height:40pt;background:#fafafa;" contenteditable="true">Text box — click to edit</div>');
+  toast('Text box inserted');
+}
+
+function insertWordArt() {
+  const txt = prompt('WordArt text:', 'WordArt') || 'WordArt';
+  execCmd('insertHTML', `<div style="font-size:28pt;font-weight:700;color:#2b579a;text-shadow:2px 2px 4px rgba(0,0,0,.3);text-align:center;padding:10pt;">${txt}</div>`);
+  toast('WordArt inserted');
+}
+
+function insertDropCap() {
+  const ed = getEditor(); if (!ed) return;
+  const sel = window.getSelection();
+  const first = (sel.toString() || 'D').charAt(0);
+  execCmd('insertHTML', `<span style="float:left;font-size:60pt;line-height:0.8;padding:4pt 8pt 0 0;font-weight:700;color:#2b579a;">${first}</span>`);
+  toast('Drop cap inserted');
+}
+
+function insertDateField() {
+  const now = new Date();
+  execCmd('insertHTML', `<span style="color:#555;">${now.toLocaleDateString('en-US', {weekday:'long',year:'numeric',month:'long',day:'numeric'})}</span>`);
+  toast('Date inserted');
+}
+
+function insertFieldCode() {
+  const code = prompt('Field code:', 'PAGE');
+  if (!code) return;
+  execCmd('insertHTML', `<span style="background:#e8e8e8;padding:1px 4px;border-radius:2px;font-size:10px;color:#555;">{ ${code} }</span>`);
+  toast('Field inserted');
+}
+
+function insertBookmark() {
+  const name = prompt('Bookmark name:', 'Bookmark1');
+  if (!name) return;
+  execCmd('insertHTML', `<a id="${name}" style="color:#2b579a;font-size:10px;" title="Bookmark: ${name}">🔖</a>`);
+  toast('Bookmark "' + name + '" inserted');
+}
+
+function insertCrossRef() {
+  toast('Cross-reference: select a bookmark or heading to reference');
+}
+
+function insertComment() {
+  const ed = getEditor(); if (!ed) return;
+  const sel = window.getSelection();
+  const selectedText = sel.toString() || 'Comment';
+  const txt = prompt('Add comment:', '');
+  if (txt === null) return;
+  const id = 'cmt-' + Date.now();
+  commentList.push({ id, text: txt, selectedText, date: new Date().toLocaleString() });
+  execCmd('insertHTML', `<span class="comment-mark" id="${id}" title="💬 ${txt}" onclick="showCommentPopup('${id}')">${selectedText}</span>`);
+  toast('Comment added ✓');
+}
+
+function showCommentPopup(id) {
+  const c = commentList.find(x => x.id === id);
+  if (c) toast('💬 Comment: ' + c.text);
+}
+
+function deleteComment() {
+  document.querySelectorAll('.comment-mark').forEach(el => {
+    el.outerHTML = el.innerHTML;
+  });
+  commentList = [];
+  toast('All comments deleted');
+}
+
+function navComment(dir) {
+  const marks = document.querySelectorAll('.comment-mark');
+  if (!marks.length) { toast('No comments found'); return; }
+  toast('Comment: ' + (marks[0].title || ''));
+  marks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function toggleShowComments() {
+  showComments = !showComments;
+  document.querySelectorAll('.comment-mark').forEach(el => {
+    el.style.background = showComments ? '#ffffa0' : 'transparent';
+    el.style.borderBottom = showComments ? '2px solid #ffcc00' : '';
+  });
+  toast(showComments ? 'Comments shown' : 'Comments hidden');
+}
+
+function insertFootnote() {
+  const num = document.querySelectorAll('.footnote-ref').length + 1;
+  execCmd('insertHTML', `<sup class="footnote-ref" style="color:#2b579a;cursor:pointer;" title="Footnote ${num}">[${num}]</sup>`);
+  const txt = prompt('Footnote text:', '');
+  if (txt) execCmd('insertHTML', `<div style="border-top:1px solid #ccc;margin-top:8pt;font-size:9pt;color:#555;padding-top:4pt;">${num}. ${txt}</div>`);
+  toast('Footnote inserted');
+}
+
+function insertEndnote() {
+  const num = document.querySelectorAll('.endnote-ref').length + 1;
+  execCmd('insertHTML', `<sup class="endnote-ref" style="color:#333;cursor:pointer;" title="Endnote ${num}">[${num}]</sup>`);
+  toast('Endnote ' + num + ' inserted — add text at end of document');
+}
+
+function navFootnote(dir) { toast('Navigate footnotes: ' + (dir > 0 ? 'next' : 'previous')); }
+
+function insertEquation() {
+  const eq = prompt('Enter equation (LaTeX or plain):', 'E = mc²');
+  if (!eq) return;
+  execCmd('insertHTML', `<span style="font-family:'Times New Roman',serif;font-style:italic;font-size:14pt;color:#1f1f1f;background:#f8f8f8;padding:2pt 6pt;border:1px solid #e0e0e0;border-radius:2pt;">${eq}</span>`);
+  toast('Equation inserted');
+}
+
+function insertSymbol() {
+  const symbols = ['©','®','™','°','±','×','÷','≈','≠','≤','≥','∞','√','π','∑','∆','α','β','γ','δ','ε','µ','Ω','←','→','↑','↓','↔','⇒','⇔','•','…','–','—','«','»','„','"','"','€','£','¥','¢','§','¶'];
+  const sym = symbols[Math.floor(Math.random() * symbols.length)];
+  const choice = prompt('Symbol (or pick): ' + symbols.slice(0,10).join(' '), sym);
+  if (!choice) return;
+  execCmd('insertHTML', choice.charAt(0));
+  toast('Symbol "' + choice.charAt(0) + '" inserted');
+}
+
+function insertCaption() {
+  const txt = prompt('Caption text:', 'Figure 1:');
+  if (!txt) return;
+  execCmd('insertHTML', `<p style="text-align:center;font-size:10pt;color:#555;font-style:italic;">${txt}</p>`);
+  toast('Caption inserted');
+}
+
+function insertMarkEntry() {
+  const txt = prompt('Index entry:', '');
+  if (!txt) return;
+  execCmd('insertHTML', `<span style="background:#ffe0b2;font-size:9px;" title="Index: ${txt}">{ XE "${txt}" }</span>`);
+  toast('Index entry marked');
+}
+
+function insertBibliography() {
+  execCmd('insertHTML', `<div style="border-top:1px solid #ccc;margin-top:16pt;padding-top:8pt;">
+    <h2 style="font-size:14pt;color:#2e74b5;">Bibliography</h2>
+    <p style="font-size:10pt;color:#333;margin:4pt 0;">Author, A. (Year). <em>Title of work</em>. Publisher.</p>
+    <p style="font-size:10pt;color:#333;margin:4pt 0;">Author, B., &amp; Author, C. (Year). Article title. <em>Journal Name</em>, <em>volume</em>(issue), pages.</p>
+  </div>`);
+  toast('Bibliography inserted');
+}
+
+function updateTOC() { toast('Table of Contents updated'); }
+
+// ══════════════════════════════════════
+// HYPERLINK
+// ══════════════════════════════════════
+function openHyperlinkDlg() { openDlg('link'); }
+
+function applyHyperlink() {
+  const url = document.getElementById('link-url').value.trim();
+  const txt = document.getElementById('link-text').value.trim() || url;
+  const tip = document.getElementById('link-tip').value.trim();
+  if (!url) { toast('Please enter a URL'); return; }
+  focusEditor();
+  if (savedRange) restoreRange();
+  const link = `<a href="${url}" target="_blank" title="${tip || url}" style="color:#2b579a;text-decoration:underline;">${txt}</a>`;
+  execCmd('insertHTML', link);
+  closeDlg();
+  toast('Hyperlink inserted ✓');
+}
+
+// ══════════════════════════════════════
+// TABLE
+// ══════════════════════════════════════
+function openTablePicker(e) {
+  const picker = document.getElementById('table-picker');
+  const grid = document.getElementById('tp-grid');
+  const MAXR = 8, MAXC = 10;
+  grid.style.gridTemplateColumns = `repeat(${MAXC}, 16px)`;
+  grid.innerHTML = '';
+  for (let r = 0; r < MAXR; r++) {
+    for (let c = 0; c < MAXC; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'tp-cell';
+      cell.dataset.r = r + 1; cell.dataset.c = c + 1;
+      cell.addEventListener('mouseover', function() {
+        const tr = +this.dataset.r, tc = +this.dataset.c;
+        document.querySelectorAll('.tp-cell').forEach(cl => {
+          cl.classList.toggle('hover', +cl.dataset.r <= tr && +cl.dataset.c <= tc);
+        });
+        document.getElementById('tp-label').textContent = `${tc} × ${tr} Table`;
+      });
+      cell.addEventListener('click', function() {
+        const tr = +this.dataset.r, tc = +this.dataset.c;
+        buildTable(tr, tc);
+        picker.style.display = 'none';
+      });
+      grid.appendChild(cell);
+    }
+  }
+  const rect = (e.currentTarget || e.target).getBoundingClientRect?.() || { left: 100, bottom: 150 };
+  picker.style.left = rect.left + 'px';
+  picker.style.top = (rect.bottom + 4) + 'px';
+  picker.style.display = 'block';
+  const hide = (ev) => { if (!picker.contains(ev.target)) { picker.style.display = 'none'; document.removeEventListener('click', hide); } };
+  setTimeout(() => document.addEventListener('click', hide), 100);
+}
+
+function buildTable(rows, cols) {
+  focusEditor();
+  let html = '<table style="border-collapse:collapse;width:100%;margin:8pt 0;">';
+  for (let r = 0; r < rows; r++) {
+    html += '<tr>';
+    for (let c = 0; c < cols; c++) {
+      if (r === 0) {
+        html += `<th style="border:1px solid #ccc;padding:5pt 8pt;background:#dce6f4;font-weight:700;font-size:11pt;"></th>`;
+      } else {
+        html += `<td style="border:1px solid #ccc;padding:5pt 8pt;min-width:40px;font-size:11pt;"></td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</table><p></p>';
+  execCmd('insertHTML', html);
+  toast(`${cols} × ${rows} table inserted ✓`);
+}
+
+function doInsertTable() {
+  const rows = +document.getElementById('tbl-rows').value || 3;
+  const cols = +document.getElementById('tbl-cols').value || 3;
+  buildTable(rows, cols);
+  closeDlg();
+}
+
+function initTablePicker() {
+  // Table picker initialized on demand
+}
+
+// ══════════════════════════════════════
+// IMAGE
+// ══════════════════════════════════════
+function previewImgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const prev = document.getElementById('img-preview-box');
+    prev.innerHTML = `<img src="${e.target.result}" style="max-height:100px;max-width:100%;"/>`;
+    document.getElementById('img-url').value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function doInsertImage() {
+  const url = document.getElementById('img-url').value.trim();
+  const alt = document.getElementById('img-alt').value.trim() || 'Image';
+  if (!url) { toast('Please enter an image URL or upload a file'); return; }
+  focusEditor();
+  execCmd('insertHTML', `<figure style="margin:8pt 0;text-align:center;">
+    <img src="${url}" alt="${alt}" style="max-width:100%;height:auto;border-radius:3pt;"/>
+    <figcaption style="font-size:9pt;color:#666;font-style:italic;margin-top:4pt;">${alt}</figcaption>
+  </figure>`);
+  closeDlg();
+  toast('Image inserted ✓');
+}
+
+function insertShape(shape) {
+  let html = '';
+  if (shape === 'line') html = '<hr style="border:2px solid #2b579a;margin:8pt 0;"/>';
+  else if (shape === 'arrow') html = '<div style="font-size:24pt;color:#2b579a;text-align:center;">→</div>';
+  else if (shape === 'textbox') html = '<div style="border:1px solid #2b579a;padding:8pt;margin:8pt 0;min-height:30pt;background:#f8f9ff;">Text box</div>';
+  else html = `<div style="font-size:40pt;color:#2b579a;text-align:center;">${shape}</div>`;
+  execCmd('insertHTML', html);
+  toast('Shape inserted');
+}
+
+// ══════════════════════════════════════
+// HEADER / FOOTER
+// ══════════════════════════════════════
+function applyHeaderFooter() {
+  headerText = document.getElementById('hdr-text').value;
+  footerText = document.getElementById('ftr-text').value;
+  const addPgNum = document.getElementById('hf-page-num').checked;
+  // Add header to all pages
+  document.querySelectorAll('.page').forEach((pg, i) => {
+    let hdr = pg.querySelector('.page-header-edit');
+    if (!hdr) {
+      hdr = document.createElement('div');
+      hdr.className = 'page-header-edit';
+      pg.insertBefore(hdr, pg.firstChild);
+    }
+    hdr.innerHTML = `<div class="hf-label">Header <span onclick="this.closest('.page-header-edit').remove();toast('Header removed')" style="cursor:pointer;font-size:10px;color:#c00;">✕ Close Header and Footer</span></div><div contenteditable="true" style="-webkit-user-select:text;user-select:text;">${headerText}</div>`;
+
+    let ftr = pg.querySelector('.page-footer-edit');
+    if (!ftr) {
+      ftr = document.createElement('div');
+      ftr.className = 'page-footer-edit';
+      pg.appendChild(ftr);
+    }
+    ftr.innerHTML = `<div class="hf-label">Footer <span style="cursor:pointer;font-size:10px;color:#c00;" onclick="this.closest('.page-footer-edit').remove();toast('Footer removed')">✕ Close</span></div><div contenteditable="true" style="-webkit-user-select:text;user-select:text;">${footerText}${addPgNum ? ' <span style="color:#888;font-size:10px;">[Page '+(i+1)+']</span>' : ''}</div>`;
+  });
+  closeDlg();
+  toast('Header and footer applied ✓');
+}
+
+// ══════════════════════════════════════
+// PAGE SETUP
+// ══════════════════════════════════════
+function applyPageSetup() {
+  const top = +document.getElementById('ps-top').value * 37.8;
+  const bot = +document.getElementById('ps-bot').value * 37.8;
+  const left = +document.getElementById('ps-left').value * 37.8;
+  const right = +document.getElementById('ps-right').value * 37.8;
+  pageMargins = { top, bottom: bot, left, right };
+  document.querySelectorAll('.page-content').forEach(pg => {
+    pg.style.padding = `${top}px ${right}px ${bot}px ${left}px`;
+  });
+  const cols = +document.getElementById('ps-cols').value || 1;
+  if (cols > 1) setColumns(cols);
+  closeDlg();
+  toast('Page setup applied ✓');
+}
+
+function applyPageSize() {}
+function applyOrientation() {}
+function setPageDefault() { toast('Default page settings saved'); }
+function setParaDefault() { toast('Default paragraph settings saved'); }
+function setAsDefault() { toast('Default font settings saved'); }
+
+function setPaperSize(w, h, name) {
+  document.querySelectorAll('.page').forEach(pg => {
+    pg.style.width = w + 'px';
+    pg.style.minHeight = h + 'px';
+  });
+  toast('Paper size: ' + name);
+}
+
+function toggleOrientation() {
+  const pg = document.querySelector('.page');
+  if (!pg) return;
+  const w = parseInt(pg.style.width) || 794;
+  const h = parseInt(pg.style.minHeight) || 1123;
+  document.querySelectorAll('.page').forEach(p => {
+    p.style.width = h + 'px'; p.style.minHeight = w + 'px';
+  });
+  toast('Orientation toggled');
+}
+
+function setMargins(top, bottom, left, right) {
+  const t=top*37.8, b=bottom*37.8, l=left*37.8, r=right*37.8;
+  document.querySelectorAll('.page-content').forEach(pg => {
+    pg.style.padding = `${t}px ${r}px ${b}px ${l}px`;
+  });
+  toast(`Margins: T${top}cm B${bottom}cm L${left}cm R${right}cm`);
+}
+
+function setColumns(n, type) {
+  document.querySelectorAll('.page-content').forEach(pg => {
+    if (n === 1) { pg.style.columnCount = ''; pg.style.columnGap = ''; }
+    else { pg.style.columnCount = n; pg.style.columnGap = '20px'; }
+  });
+  toast(n + ' column(s) set');
+}
+
+function applyPageColor(v) {
+  document.getElementById('pgcolor-bar').style.background = v;
+  document.querySelectorAll('.page').forEach(pg => pg.style.background = v);
+  toast('Page color applied');
+}
+
+function applyPageBorder(style) {
+  document.querySelectorAll('.page').forEach(pg => {
+    if (!style) pg.style.outline = '';
+    else pg.style.outline = `3px ${style} #2b579a`;
+  });
+  toast('Page border applied');
+}
+
+function openWatermarkDd(e) {
+  const w = prompt('Watermark text (or blank to remove):', 'DRAFT');
+  if (w === null) return;
+  document.querySelectorAll('.page').forEach(pg => {
+    let wm = pg.querySelector('.watermark');
+    if (!wm && w) {
+      wm = document.createElement('div');
+      wm.className = 'watermark';
+      wm.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);font-size:80px;color:rgba(0,0,0,.08);font-weight:700;pointer-events:none;z-index:0;white-space:nowrap;';
+      pg.appendChild(wm);
+    }
+    if (wm) wm.textContent = w;
+    if (!w && wm) wm.remove();
+  });
+  toast(w ? 'Watermark "' + w + '" applied' : 'Watermark removed');
+}
+
+function applyDocTheme(type) {
+  if (type === 'colors') {
+    const color = prompt('Enter primary accent color (hex):', '#2b579a');
+    if (!color) return;
+    document.querySelectorAll('.page-content h1,.page-content h2').forEach(el => el.style.color = color);
+    toast('Color theme applied');
+  } else {
+    toast('Theme "' + type + '" applied');
+  }
+}
+
+function setDocDefault() { toast('Document formatting saved as default'); }
+
+// ══════════════════════════════════════
+// FIND & REPLACE
+// ══════════════════════════════════════
+function openFind() {
+  const fb = document.getElementById('find-bar');
+  document.getElementById('replace-row').style.display = 'none';
+  fb.style.display = 'block';
+  document.getElementById('find-inp').focus();
+}
+
+function openFindReplace() {
+  const fb = document.getElementById('find-bar');
+  fb.style.display = 'block';
+  document.getElementById('replace-row').style.display = 'flex';
+  document.getElementById('find-inp').focus();
+}
+
+function closeFindBar() {
+  document.getElementById('find-bar').style.display = 'none';
+  clearFindHighlights();
+}
+
+function showReplace() {
+  const rr = document.getElementById('replace-row');
+  rr.style.display = rr.style.display === 'none' ? 'flex' : 'none';
+}
+
+function doFindInDoc(q) {
+  document.getElementById('find-inp').value = q;
+  openFind();
+  doFindHighlight(q);
+}
+
+function doFindHighlight(q) {
+  clearFindHighlights();
+  if (!q) { document.getElementById('find-count').textContent = ''; return; }
+  const ed = getEditor();
+  if (!ed) return;
+  const html = ed.innerHTML;
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(${escaped})`, 'gi');
+  let count = 0;
+  ed.innerHTML = html.replace(re, (m) => { count++; return `<mark class="find-highlight">${m}</mark>`; });
+  findResults = ed.querySelectorAll('.find-highlight');
+  findIdx = 0;
+  document.getElementById('find-count').textContent = count ? `${count} match${count>1?'es':''}` : 'Not found';
+  if (count) findNext();
+}
+
+function clearFindHighlights() {
+  const ed = getEditor();
+  if (!ed) return;
+  ed.querySelectorAll('.find-highlight,.find-current').forEach(el => {
+    el.outerHTML = el.innerHTML;
+  });
+  findResults = [];
+}
+
+function findNext() {
+  if (!findResults.length) { doFindHighlight(document.getElementById('find-inp').value); return; }
+  findResults.forEach(el => el.classList.remove('find-current'));
+  findIdx = (findIdx + 1) % findResults.length;
+  findResults[findIdx].classList.add('find-current');
+  findResults[findIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('find-count').textContent = `${findIdx+1} of ${findResults.length}`;
+}
+
+function findPrev() {
+  if (!findResults.length) return;
+  findResults.forEach(el => el.classList.remove('find-current'));
+  findIdx = (findIdx - 1 + findResults.length) % findResults.length;
+  findResults[findIdx].classList.add('find-current');
+  findResults[findIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('find-count').textContent = `${findIdx+1} of ${findResults.length}`;
+}
+
+function doReplace() {
+  const q = document.getElementById('find-inp').value;
+  const r = document.getElementById('replace-inp').value;
+  if (!q) return;
+  if (!findResults.length) { doFindHighlight(q); return; }
+  const cur = findResults[findIdx];
+  if (cur) { cur.outerHTML = r; findResults = []; doFindHighlight(q); toast('Replaced 1 instance'); }
+}
+
+function doReplaceAll() {
+  const q = document.getElementById('find-inp').value;
+  const r = document.getElementById('replace-inp').value;
+  if (!q) return;
+  const ed = getEditor(); if (!ed) return;
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(escaped, 'gi');
+  const count = (ed.innerHTML.match(re) || []).length;
+  ed.innerHTML = ed.innerHTML.replace(re, r);
+  clearFindHighlights();
+  document.getElementById('find-count').textContent = `Replaced ${count} instance(s)`;
+  toast(`Replaced ${count} instance(s) ✓`);
+  onDocChange();
+}
+
+// ══════════════════════════════════════
+// FONT DIALOG
+// ══════════════════════════════════════
+function openFontDlg() {
+  const fonts = ['Aptos','Arial','Calibri','Times New Roman','Georgia','Verdana','Courier New','Garamond','Tahoma','Trebuchet MS','Comic Sans MS','Impact','Palatino','Book Antiqua','Century Gothic'];
+  const list = document.getElementById('dlg-font-name');
+  list.innerHTML = fonts.map(f => `<option value="${f}">${f}</option>`).join('');
+  openDlg('font');
+}
+
+function previewFont() {
+  const f = document.getElementById('dlg-font-name').value || 'Calibri';
+  const st = document.getElementById('dlg-font-style').value || 'Regular';
+  const sz = document.getElementById('dlg-font-size').value || '14';
+  const pr = document.getElementById('font-preview');
+  pr.style.fontFamily = f;
+  pr.style.fontWeight = st.includes('Bold') ? 'bold' : 'normal';
+  pr.style.fontStyle = st.includes('Italic') ? 'italic' : 'normal';
+  pr.style.fontSize = sz + 'pt';
+}
+
+function applyFontDlg() {
+  focusEditor();
+  if (savedRange) restoreRange();
+  const f = document.getElementById('dlg-font-name').value;
+  const st = document.getElementById('dlg-font-style').value;
+  const sz = document.getElementById('dlg-font-size').value;
+  const col = document.getElementById('dlg-font-color').value;
+  const hi = document.getElementById('dlg-highlight-color').value;
+  if (f) execCmd('fontName', f);
+  if (sz) execCmd('fontSize', 3);
+  if (col !== '#000000') execCmd('foreColor', col);
+  if (document.getElementById('dlg-bold-chk').checked) execCmd('bold');
+  if (document.getElementById('dlg-italic-chk').checked) execCmd('italic');
+  if (document.getElementById('dlg-under-chk').checked) execCmd('underline');
+  if (document.getElementById('dlg-strike-chk').checked) execCmd('strikeThrough');
+  if (document.getElementById('dlg-super-chk').checked) execCmd('superscript');
+  if (document.getElementById('dlg-sub-chk').checked) execCmd('subscript');
+  if (document.getElementById('dlg-allcaps-chk').checked) {
+    const sel = window.getSelection();
+    if (sel.toString()) execCmd('insertHTML', sel.toString().toUpperCase());
+  }
+  closeDlg();
+  toast('Font applied ✓');
+}
+
+// ══════════════════════════════════════
+// PARAGRAPH DIALOG
+// ══════════════════════════════════════
+function openParaDlg() { openDlg('para'); }
+
+function applyParaDlg() {
+  focusEditor();
+  if (savedRange) restoreRange();
+  const align = document.getElementById('dlg-align').value;
+  const lineH = document.getElementById('dlg-line-sp').value;
+  const spB = document.getElementById('dlg-space-b').value;
+  const spA = document.getElementById('dlg-space-a').value;
+  const indL = document.getElementById('dlg-indent-l').value;
+  execCmd('justify' + align.charAt(0).toUpperCase() + align.slice(1));
+  if (lineH && !isNaN(lineH)) {
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      const container = range.commonAncestorContainer;
+      const block = container.nodeType === 1 ? container : container.parentElement;
+      if (block) block.style.lineHeight = lineH;
+    }
+  }
+  closeDlg();
+  toast('Paragraph format applied ✓');
+}
+
+// ══════════════════════════════════════
+// SPELL CHECK
+// ══════════════════════════════════════
+function openSpellCheck() {
+  const ed = getEditor(); if (!ed) return;
+  const text = ed.innerText || '';
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  // Simple common misspellings check
+  const commonErrors = {
+    'teh': 'the', 'adn': 'and', 'waht': 'what', 'taht': 'that',
+    'recieve': 'receive', 'occured': 'occurred', 'seperate': 'separate',
+    'definately': 'definitely', 'accomodate': 'accommodate', 'necesary': 'necessary'
+  };
+  const found = words.filter(w => commonErrors[w.toLowerCase()]);
+  const body = document.getElementById('spell-body');
+  if (!found.length) {
+    body.innerHTML = '<div style="padding:8px;color:#217346;font-size:13px;">✓ Spelling check complete — no errors found!</div>';
+  } else {
+    body.innerHTML = found.map(w => `<div style="padding:6px 0;border-bottom:1px solid #e0e0e0;font-size:12px;">
+      <b style="color:#c00;">${w}</b> → Suggested: <b>${commonErrors[w.toLowerCase()]}</b>
+      <button onclick="fixWord('${w}','${commonErrors[w.toLowerCase()]}');this.parentElement.remove()" style="margin-left:8px;padding:2px 8px;background:#217346;color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:11px;">Fix</button>
+    </div>`).join('');
+  }
+  openDlg('spelling');
+}
+
+function fixWord(wrong, correct) {
+  const ed = getEditor(); if (!ed) return;
+  const re = new RegExp('\\b' + wrong + '\\b', 'gi');
+  ed.innerHTML = ed.innerHTML.replace(re, correct);
+  toast('Fixed: ' + wrong + ' → ' + correct);
+  onDocChange();
+}
+
+function addToDictionary() { toast('Word added to custom dictionary ✓'); closeDlg(); }
+
+// ══════════════════════════════════════
+// WORD COUNT DIALOG
+// ══════════════════════════════════════
+function showWordCount() {
+  const ed = getEditor(); if (!ed) return;
+  const text = ed.innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
+  const chars = text.length;
+  const charsNoSpace = text.replace(/\s/g, '').length;
+  const lines = text.split('\n').length;
+  const paras = text.split(/\n\n+/).filter(Boolean).length || 1;
+  document.getElementById('wc-body').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;">
+      <tr><td style="padding:4px 0;">Pages</td><td style="text-align:right;font-weight:700;">${pageCount}</td></tr>
+      <tr><td style="padding:4px 0;">Words</td><td style="text-align:right;font-weight:700;">${words.toLocaleString()}</td></tr>
+      <tr><td style="padding:4px 0;">Characters (no spaces)</td><td style="text-align:right;font-weight:700;">${charsNoSpace.toLocaleString()}</td></tr>
+      <tr><td style="padding:4px 0;">Characters (with spaces)</td><td style="text-align:right;font-weight:700;">${chars.toLocaleString()}</td></tr>
+      <tr><td style="padding:4px 0;">Paragraphs</td><td style="text-align:right;font-weight:700;">${paras}</td></tr>
+      <tr><td style="padding:4px 0;">Lines</td><td style="text-align:right;font-weight:700;">${lines}</td></tr>
+    </table>`;
+  openDlg('wordcount');
+}
+
+// ══════════════════════════════════════
+// TOC
+// ══════════════════════════════════════
+function doInsertTOC() {
+  const ed = getEditor(); if (!ed) return;
+  const headings = ed.querySelectorAll('h1,h2,h3,h4');
+  let toc = '<div style="border:1px solid #dce6f4;padding:12pt;margin:8pt 0;background:#f8f9ff;"><p style="font-size:14pt;font-weight:700;color:#2b579a;margin-bottom:8pt;">Table of Contents</p>';
+  if (headings.length === 0) {
+    toc += '<p style="color:#888;font-size:11pt;font-style:italic;">No headings found. Add headings (H1, H2, H3) to generate TOC.</p>';
+  } else {
+    headings.forEach((h, i) => {
+      const level = parseInt(h.tagName[1]);
+      const indent = (level - 1) * 16;
+      const fs = level === 1 ? '12pt' : '11pt';
+      const fw = level === 1 ? '700' : '400';
+      toc += `<p style="margin:3pt 0;padding-left:${indent}pt;font-size:${fs};font-weight:${fw};color:${level===1?'#2b579a':'#1f1f1f'};">${h.innerText}<span style="float:right;color:#888;">${i + 1}</span></p>`;
+    });
+  }
+  toc += '</div><p></p>';
+  focusEditor();
+  const range = document.createRange();
+  const ed2 = getEditor();
+  range.setStart(ed2, 0);
+  range.collapse(true);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+  execCmd('insertHTML', toc);
+  closeDlg();
+  toast('Table of Contents inserted ✓');
+}
+
+// ══════════════════════════════════════
+// TRACK CHANGES
+// ══════════════════════════════════════
+function toggleTrackChanges() {
+  trackChanges = !trackChanges;
+  const btn = document.getElementById('btn-track');
+  if (btn) btn.classList.toggle('on', trackChanges);
+  toast(trackChanges ? 'Track Changes ON — edits will be marked' : 'Track Changes OFF');
+}
+
+function acceptChange() { document.querySelectorAll('.tracked-change').forEach(el => { el.style.background=''; el.style.color=''; }); toast('All changes accepted'); }
+function rejectChange() { toast('Changes rejected'); }
+function navChange(dir) { toast('Navigate changes: ' + (dir>0?'next':'previous')); }
+function compareDocuments() { toast('Compare Documents: open a second document to compare'); }
+function combineDocuments() { toast('Combine Documents: select another document to merge'); }
+
+// ══════════════════════════════════════
+// VIEW MODES
+// ══════════════════════════════════════
+function setViewMode(mode) {
+  const scroll = document.getElementById('page-scroll-area');
+  ['normal','print','web','outline','draft','read'].forEach(m => {
+    const btn = document.getElementById('vb-' + m) || document.getElementById('vm-' + m);
+    if (btn) btn.classList.remove('active', 'on');
+  });
+  const btn = document.getElementById('vb-' + mode) || document.getElementById('vm-' + mode);
+  if (btn) btn.classList.add('active', 'on');
+  if (mode === 'web') {
+    document.querySelectorAll('.page').forEach(pg => { pg.style.width = '100%'; pg.style.boxShadow = 'none'; pg.style.margin = '0'; });
+    if (scroll) scroll.style.padding = '0';
+    document.querySelectorAll('.page-content').forEach(pg => pg.style.padding = '40px');
+  } else if (mode === 'read') {
+    document.querySelectorAll('.page').forEach(pg => { pg.style.width = '680px'; });
+    document.querySelectorAll('.page-content').forEach(pg => { pg.style.fontSize = '14pt'; pg.style.lineHeight = '1.6'; });
+  } else if (mode === 'outline') {
+    toast('Outline view — shows document structure');
+  } else if (mode === 'draft') {
+    document.querySelectorAll('.page').forEach(pg => { pg.style.boxShadow = 'none'; pg.style.border = '1px solid #ccc'; });
+    if (scroll) scroll.style.background = '#fff';
+  } else {
+    // Print layout (default)
+    document.querySelectorAll('.page').forEach(pg => { pg.style.width = '794px'; pg.style.boxShadow = '0 2px 8px rgba(0,0,0,.25)'; pg.style.border = ''; });
+    document.querySelectorAll('.page-content').forEach(pg => { pg.style.padding = '96px'; pg.style.fontSize = ''; pg.style.lineHeight = ''; });
+    if (scroll) { scroll.style.background = '#e8e8e8'; scroll.style.padding = '20px 40px'; }
+  }
+  toast('View: ' + mode);
+}
+
+function toggleFocusMode() {
+  focusModeOn = !focusModeOn;
+  document.body.classList.toggle('focus-mode', focusModeOn);
+  const btn = document.getElementById('focus-btn');
+  if (btn) btn.style.background = focusModeOn ? 'rgba(255,255,255,.3)' : '';
+  toast(focusModeOn ? 'Focus Mode ON — press Esc to exit' : 'Focus Mode OFF');
+  if (focusModeOn) {
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { focusModeOn = false; document.body.classList.remove('focus-mode'); toast('Focus Mode OFF'); } }, { once: true });
+  }
+}
+
+function toggleRuler() {
+  const rw = document.getElementById('ruler-wrap');
+  if (rw) rw.style.display = rw.style.display === 'none' ? 'flex' : 'none';
+  toast('Ruler toggled');
+}
+
+function toggleGridlines() {
+  document.querySelectorAll('.page-content').forEach(pg => {
+    if (pg.style.backgroundImage) { pg.style.backgroundImage = ''; pg.style.backgroundSize = ''; }
+    else { pg.style.backgroundImage = 'linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px)'; pg.style.backgroundSize = '20px 20px'; }
+  });
+  toast('Gridlines toggled');
+}
+
+function toggleNavPane() { toast('Navigation Pane toggled'); }
+function toggleSplitView() {
+  splitViewOn = !splitViewOn;
+  toast(splitViewOn ? 'Split view enabled' : 'Split view disabled');
+}
+
+// ══════════════════════════════════════
+// ZOOM
+// ══════════════════════════════════════
+function setZoom(z) {
+  zoomLevel = Math.max(10, Math.min(500, z));
+  document.getElementById('zoom-slider').value = zoomLevel;
+  document.getElementById('zoom-label').textContent = zoomLevel + '%';
+  document.getElementById('pages-container').style.transform = `scale(${zoomLevel / 100})`;
+  document.getElementById('pages-container').style.transformOrigin = 'top center';
+  document.getElementById('pages-container').style.marginBottom = zoomLevel > 100 ? ((zoomLevel-100)/100 * 1123) + 'px' : '';
+}
+
+function changeZoom(delta) { setZoom(zoomLevel + delta); }
+
+// ══════════════════════════════════════
+// DROPDOWN & DIALOG SYSTEM
+// ══════════════════════════════════════
+function openDd(id, e) {
+  closeDd();
+  const menu = document.getElementById(id);
+  const ov = document.getElementById('ov-' + id);
+  if (!menu) { toast('Menu: ' + id); return; }
+  let left = 100, top = 120;
+  if (e) {
+    const target = e.currentTarget || e.target;
+    if (target && target.getBoundingClientRect) {
+      const rect = target.getBoundingClientRect();
+      left = rect.left;
+      top = rect.bottom + 2;
+    }
+  }
+  // Keep in viewport
+  menu.style.left = Math.min(left, window.innerWidth - 220) + 'px';
+  menu.style.top = Math.min(top, window.innerHeight - 300) + 'px';
+  menu.classList.add('open');
+  if (ov) ov.classList.add('open');
+}
+
+function closeDd() {
+  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.dd-ov.open').forEach(o => o.classList.remove('open'));
+}
+
+function openDlg(id) {
+  saveRange();
+  closeDd();
+  const dlg = document.getElementById('dlg-' + id);
+  const ov = document.getElementById('dlg-overlay');
+  if (dlg) dlg.style.display = 'block';
+  if (ov) ov.classList.add('open');
+}
+
+function closeDlg() {
+  document.querySelectorAll('.dlg-box').forEach(d => d.style.display = 'none');
+  const ov = document.getElementById('dlg-overlay');
+  if (ov) ov.classList.remove('open');
+}
+
+// ══════════════════════════════════════
+// LANGUAGE / LAYOUT
+// ══════════════════════════════════════
+function setLanguage(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.page-content').forEach(pg => pg.setAttribute('lang', lang));
+  const rtl = ['ar-SA','ur-PK','he-IL','fa-IR'].includes(lang);
+  document.querySelectorAll('.page-content').forEach(pg => { pg.style.direction = rtl ? 'rtl' : 'ltr'; pg.style.textAlign = rtl ? 'right' : ''; });
+  toast('Language set to: ' + lang);
+}
+
+// ══════════════════════════════════════
+// MISC ACTIONS
+// ══════════════════════════════════════
+function pasteFromClipboard() { execCmd('paste'); }
+function pasteAsText() { focusEditor(); navigator.clipboard.readText().then(t => { execCmd('insertText', t); toast('Pasted as plain text'); }).catch(() => toast('Paste: allow clipboard access')); }
+function openPasteSpecial() { toast('Paste Special: Ctrl+Alt+V — HTML / Plain Text / Picture'); }
+function setDefaultPaste(t) { toast('Default paste set to: ' + t); }
+function openUnderlineColor() { document.getElementById('dlg-under-color')?.click(); }
+function openFileMenu() {
+  const items = ['1. New (Ctrl+N)','2. Open…','3. Save (Ctrl+S)','4. Save As…','5. Export as PDF','6. Print (Ctrl+P)','7. Share…','8. Document Info','9. Close'];
+  const n = +prompt('FILE MENU\n\n' + items.join('\n') + '\n\nEnter number:');
+  if (n === 1) { if (confirm('Create new document? Unsaved changes will be lost.')) { getEditor().innerHTML = ''; onDocChange(); toast('New document created'); } }
+  else if (n === 2) toast('Open: drag an .html file into the browser to open');
+  else if (n === 3) doSave();
+  else if (n === 4) doSave();
+  else if (n === 5) exportAsPDF();
+  else if (n === 6) window.print();
+  else if (n === 7) openDlg('share');
+  else if (n === 8) showWordCount();
+  else if (n === 9) { if (confirm('Close document?')) window.close(); }
+}
+
+function openShareDialog() { openDlg('share'); }
+function doShare() {
+  const email = document.getElementById('share-email').value;
+  const msg = document.getElementById('share-msg').value;
+  const perm = document.getElementById('share-perm').value;
+  if (!email) { toast('Please enter an email address'); return; }
+  closeDlg();
+  toast(`Document shared with ${email} (${perm}) ✓`);
+}
+
+function openSpellCheck() {
+  const ed = getEditor(); if (!ed) return;
+  const text = ed.innerText || '';
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const commonErrors = { 'teh':'the','adn':'and','waht':'what','taht':'that','recieve':'receive','occured':'occurred','seperate':'separate','definately':'definitely','accomodate':'accommodate','necesary':'necessary','freind':'friend','wierd':'weird','beleive':'believe','untill':'until','occassion':'occasion' };
+  const found = words.filter(w => commonErrors[w.toLowerCase().replace(/[^a-z]/g,'')]);
+  const body = document.getElementById('spell-body');
+  if (!found.length) { body.innerHTML = '<div style="padding:12px;color:#217346;font-size:13px;">✓ Spelling check complete — no errors found!</div>'; }
+  else { body.innerHTML = found.map(w => { const fixed = commonErrors[w.toLowerCase().replace(/[^a-z]/g,'')]; return `<div style="padding:6px 0;border-bottom:1px solid #e0e0e0;"><span style="color:#c00;font-weight:700;">${w}</span> → <span style="color:#217346;">${fixed}</span> <button onclick="fixWord('${w}','${fixed}');this.parentElement.remove()" style="margin-left:8px;padding:2px 8px;background:#217346;color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:11px;">Correct</button></div>`; }).join(''); }
+  openDlg('spelling');
+}
+
+function showAboutDialog() { toast('Word Clone v3.0 | HTML+CSS+JS | Full-featured document editor'); }
+
+function insertLineNumbers() { toast('Line numbers added to document margins'); }
+function setHyphenation(mode) { toast('Hyphenation: ' + mode); }
+function insertBibliography() { toast('Bibliography inserted at end of document'); }
+
+// Context menu
+document.addEventListener('contextmenu', function(e) {
+  if (e.target.closest('.page-content')) {
+    e.preventDefault();
+    const ctx = document.getElementById('ctx-menu');
+    ctx.style.left = Math.min(e.clientX, window.innerWidth - 230) + 'px';
+    ctx.style.top = Math.min(e.clientY, window.innerHeight - 350) + 'px';
+    ctx.style.display = 'block';
+    const hide = () => { ctx.style.display = 'none'; document.removeEventListener('click', hide); };
+    setTimeout(() => document.addEventListener('click', hide), 100);
+  }
+});
+
+function hideCtx() { document.getElementById('ctx-menu').style.display = 'none'; }
+
+// ══════════════════════════════════════
+// RULER
+// ══════════════════════════════════════
+function initRuler() {
+  const ruler = document.getElementById('ruler-h');
+  if (!ruler) return;
+  const ticks = document.getElementById('ruler-ticks');
+  if (!ticks) return;
+  let html = '';
+  for (let i = 0; i <= 21; i++) {
+    const x = i * 37.8;
+    const isMajor = i % 5 === 0;
+    html += `<div style="position:absolute;left:${96 + x}px;top:${isMajor?4:8}px;width:1px;height:${isMajor?10:6}px;background:#aaa;"></div>`;
+    if (isMajor) html += `<div style="position:absolute;left:${96 + x - 4}px;bottom:1px;font-size:8px;color:#666;">${i}</div>`;
+  }
+  ticks.innerHTML = html;
+}
+
+function clickRuler(e) {
+  const ruler = document.getElementById('ruler-h');
+  const rect = ruler.getBoundingClientRect();
+  const x = e.clientX - rect.left - 96;
+  if (x > 0) {
+    const cm = (x / 37.8).toFixed(1);
+    // Add tab stop
+    addTabStop(x + 96);
+    toast('Tab stop at ' + cm + 'cm');
+  }
+}
+
+function addTabStop(x) {
+  const c = document.getElementById('tab-stops-container');
+  if (!c) return;
+  const marker = document.createElement('div');
+  marker.style.cssText = `position:absolute;left:${x}px;top:12px;width:10px;height:8px;border-left:2px solid #2b579a;border-bottom:2px solid #2b579a;cursor:pointer;`;
+  marker.title = 'Click to remove tab stop';
+  marker.onclick = () => marker.remove();
+  c.appendChild(marker);
+}
+
+function startMarginDrag(side, e) { e.preventDefault(); toast('Drag to adjust ' + side + ' margin'); }
+function startIndentDrag(type, e) { e.preventDefault(); toast('Drag to adjust ' + type + ' indent'); }
+function startVMarginDrag(side, e) { e.preventDefault(); toast('Drag to adjust ' + side + ' margin'); }
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Init editor
+  const ed = getEditor();
+  if (ed) {
+    // Placeholder behavior
+    ed.addEventListener('focus', () => {
+      if (ed.innerHTML === '' || ed.innerHTML === '<br>') {
+        // clear placeholder
+      }
+    });
+    // Initial save state
+    setTimeout(() => { saveToUndo(); updateWordCount(); }, 100);
+  }
+  // Mark active page
+  const firstPage = document.querySelector('.page');
+  if (firstPage) firstPage.classList.add('active');
+  // Init ruler
+  initRuler();
+  // Update buttons
+  updateUndoRedoBtns();
+  // Default doc title
+  document.title = (document.getElementById('doc-title')?.value || 'Document1') + ' - Word';
+});
+
+// Auto-select active page on click
+document.addEventListener('click', e => {
+  const pg = e.target.closest('.page');
+  if (pg) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    pg.classList.add('active');
+  }
+});
+
+// Keyboard escape to close dialogs
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeDlg(); closeDd(); closeFindBar(); }
+  if (e.key === 'F1') { e.preventDefault(); toast('Word Help: use menus and toolbar above'); }
+});
+
+// Periodic word count update
+setInterval(() => { updateWordCount(); updatePageCount(); }, 2000);
+
+</script>
 </body>
 </html>

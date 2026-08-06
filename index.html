@@ -14,11 +14,12 @@
     rel="stylesheet" />
   <!-- Quill.js CSS -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  
+
   <!-- Jspreadsheet CSS -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites@4.3.2/dist/jsuites.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4.13.3/dist/jspreadsheet.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4.13.3/dist/jspreadsheet.css"
+    type="text/css" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -374,65 +375,70 @@
     .animate-pulse-glow {
       animation: pulseGlow 2s infinite;
     }
-  
+
     /* === EXCEL-LIKE THEME FOR JSPREADSHEET === */
     #jspreadsheet-container {
-        background-color: #ffffff;
-        color: #000000;
-        padding: 0;
-        overflow: visible;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 0;
+      overflow: visible;
     }
-    
+
     /* Force Jexcel elements to have visible borders and light background to match original Excel */
     .jexcel {
-        background-color: #ffffff !important;
-        color: #000000 !important;
+      background-color: #ffffff !important;
+      color: #000000 !important;
     }
-    
+
     .jexcel tbody tr td {
-        background-color: #ffffff;
-        color: #000000;
-        border: 1px solid #d4d4d4 !important;
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #d4d4d4 !important;
     }
-    
+
     .jexcel thead tr td {
-        background-color: #f3f4f6 !important;
-        color: #374151 !important;
-        border: 1px solid #d4d4d4 !important;
-        font-weight: 600;
+      background-color: #f3f4f6 !important;
+      color: #374151 !important;
+      border: 1px solid #d4d4d4 !important;
+      font-weight: 600;
     }
-    
+
     /* Fix active cell highlight */
     .jexcel .highlight {
-        background-color: rgba(33, 115, 70, 0.1) !important;
+      background-color: rgba(33, 115, 70, 0.1) !important;
     }
-    
+
     .jexcel .highlight-left {
-        border-left: 2px solid #217346 !important;
+      border-left: 2px solid #217346 !important;
     }
+
     .jexcel .highlight-right {
-        border-right: 2px solid #217346 !important;
+      border-right: 2px solid #217346 !important;
     }
+
     .jexcel .highlight-top {
-        border-top: 2px solid #217346 !important;
+      border-top: 2px solid #217346 !important;
     }
+
     .jexcel .highlight-bottom {
-        border-bottom: 2px solid #217346 !important;
+      border-bottom: 2px solid #217346 !important;
     }
-    
+
     /* Fix context menu in dark mode */
     .jexcel_contextmenu {
-        background-color: #ffffff;
-        color: #000000;
-        border: 1px solid #ccc;
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #ccc;
     }
+
     .jexcel_contextmenu a {
-        color: #000000;
+      color: #000000;
     }
+
     .jexcel_contextmenu a:hover {
-        background-color: #e5e7eb;
+      background-color: #e5e7eb;
     }
-    </style>
+  </style>
 </head>
 
 <body class="flex flex-col h-screen overflow-hidden bg-appbg text-slate-100">
@@ -571,217 +577,9 @@
       <!-- PANEL 1: DOCUMENT EDITOR MODULE                                   -->
       <!-- ================================================================= -->
       <div id="panel-doc" class="flex-1 flex flex-col bg-surface overflow-hidden border-r border-borderDark">
-
-        <!-- COMPLETE DOCUMENT TOOLBAR (Matching image precisely) -->
-        <div
-          class="bg-surface2 px-3 py-1.5 border-b border-borderDark flex flex-wrap items-center gap-1.5 text-xs shrink-0 select-none z-20">
-
-          <!-- Text Styling Group: Bold, Italic, Underline, Strikethrough -->
-          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
-            <button onclick="execDocCmd('bold')" class="tb-icon-btn font-bold" title="Bold (Ctrl+B)">B</button>
-            <button onclick="execDocCmd('italic')" class="tb-icon-btn italic" title="Italic (Ctrl+I)">I</button>
-            <button onclick="execDocCmd('underline')" class="tb-icon-btn underline"
-              title="Underline (Ctrl+U)">U</button>
-            <button onclick="execDocCmd('strikeThrough')" class="tb-icon-btn line-through"
-              title="Strikethrough">S</button>
-          </div>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Blockquote & Code Block -->
-          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
-            <button onclick="execDocCmd('formatBlock', 'blockquote')"
-              class="tb-icon-btn text-purple-300 font-serif font-bold text-sm" title="Blockquote">”</button>
-            <button onclick="execDocCmd('formatBlock', '<pre>')"
-              class="tb-icon-btn font-mono text-emerald-400 font-semibold text-xs" title="Code Block">&lt;/&gt;</button>
-          </div>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Headings Quick Buttons: H1, H2 -->
-          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
-            <button onclick="execDocCmd('formatBlock', '<h1>')" class="tb-icon-btn font-mono font-bold text-primary"
-              title="Heading 1">H₁</button>
-            <button onclick="execDocCmd('formatBlock', '<h2>')" class="tb-icon-btn font-mono font-bold text-accent"
-              title="Heading 2">H₂</button>
-          </div>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Lists Group: Numbered & Bulleted -->
-          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
-            <button onclick="execDocCmd('insertOrderedList')" class="tb-icon-btn font-mono" title="Numbered List">1.
-              ≡</button>
-            <button onclick="execDocCmd('insertUnorderedList')" class="tb-icon-btn font-mono" title="Bullet List">•
-              ☰</button>
-          </div>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Subscript / Superscript: x₂, x² -->
-          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
-            <button onclick="execDocCmd('subscript')" class="tb-icon-btn font-mono text-[11px]"
-              title="Subscript">x₂</button>
-            <button onclick="execDocCmd('superscript')" class="tb-icon-btn font-mono text-[11px]"
-              title="Superscript">x²</button>
-          </div>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Indent / Outdent Controls -->
-          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
-            <button onclick="execDocCmd('outdent')" class="tb-icon-btn" title="Decrease Indent">⇤</button>
-            <button onclick="execDocCmd('indent')" class="tb-icon-btn" title="Increase Indent">⇥</button>
-          </div>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Paragraph Block Selector Dropdown -->
-          <select onchange="execDocCmd('formatBlock', this.value)"
-            class="bg-appbg border border-borderDark text-slate-300 rounded px-2 py-1 outline-none text-xs hover:border-primary">
-            <option value="<p>">Normal</option>
-            <option value="<h1>">Heading 1</option>
-            <option value="<h2>">Heading 2</option>
-            <option value="<h3>">Heading 3</option>
-            <option value="<h4>">Heading 4</option>
-            <option value="<blockquote>">Quote Block</option>
-            <option value="<pre>">Code Block</option>
-          </select>
-
-          <!-- Text Alignment Selector Dropdown -->
-          <select onchange="execDocCmd(this.value)"
-            class="bg-appbg border border-borderDark text-slate-300 rounded px-2 py-1 outline-none text-xs hover:border-primary">
-            <option value="justifyLeft">Align Left</option>
-            <option value="justifyCenter">Align Center</option>
-            <option value="justifyRight">Align Right</option>
-            <option value="justifyFull">Justify</option>
-          </select>
-
-          <!-- Font Family Selector Dropdown -->
-          <select onchange="execDocCmd('fontName', this.value)"
-            class="bg-appbg border border-borderDark text-slate-300 rounded px-2 py-1 outline-none text-xs hover:border-primary font-mono">
-            <option value="Inter">Sans Serif</option>
-            <option value="Space Grotesk">Space Grotesk</option>
-            <option value="JetBrains Mono">Monospace</option>
-            <option value="Georgia">Serif</option>
-            <option value="Arial">Arial</option>
-          </select>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Text Color & Fill Highlight Color Pickers -->
-          <div class="flex items-center gap-1 relative">
-            <label
-              class="tb-icon-btn text-accent cursor-pointer border border-transparent hover:border-borderDark font-bold underline"
-              title="Text Color">
-              A
-              <input type="color" onchange="execDocCmd('foreColor', this.value)" class="w-0 h-0 opacity-0 absolute" />
-            </label>
-
-            <label
-              class="tb-icon-btn text-amber-400 cursor-pointer border border-transparent hover:border-borderDark bg-amber-500/10 font-bold"
-              title="Highlight Color">
-              A
-              <input type="color" value="#f59e0b" onchange="execDocCmd('hiliteColor', this.value)"
-                class="w-0 h-0 opacity-0 absolute" />
-            </label>
-          </div>
-
-          <div class="w-px h-4 bg-borderDark mx-0.5"></div>
-
-          <!-- Link, Image, Media & Clear Formatting ($T_x$) -->
-          <div class="flex items-center gap-0.5 bg-appbg/50 p-0.5 rounded border border-borderDark">
-            <button onclick="openModal('link')" class="tb-icon-btn" title="Insert Link">🔗</button>
-            <button onclick="openModal('image')" class="tb-icon-btn" title="Insert Image">🖼</button>
-            <button onclick="openModal('video')" class="tb-icon-btn" title="Insert Video/Media">🎬</button>
-            <button onclick="openModal('table')" class="tb-icon-btn text-emerald-400" title="Insert Table">📊</button>
-            <button onclick="execDocCmd('removeFormat')" class="tb-icon-btn text-red-400 font-mono font-bold"
-              title="Clear Formatting (Tx)">Tₓ</button>
-          </div>
-
-          <button onclick="triggerDocAiAssist()"
-            class="ml-auto px-2.5 py-1 rounded bg-aiPurple/20 text-purple-300 border border-aiPurple/40 hover:bg-aiPurple/30 font-mono text-[11px] flex items-center gap-1 transition-all">
-            <span>✦ AI Autocomplete</span>
-          </button>
+        <div class="flex-1 w-full relative">
+          <iframe src="word.html" class="w-full h-full border-none"></iframe>
         </div>
-
-        <!-- DOCUMENT CANVAS CANVAS WRAPPER -->
-        <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-appbg flex justify-center">
-          <div
-            class="w-full max-w-3xl bg-surface border border-borderDark rounded-xl shadow-2xl p-8 md:p-12 min-h-[600px] flex flex-col relative">
-
-            <div id="doc-editor" class="doc-canvas flex-1 focus:outline-none">
-              <h1>Start typing your document here...</h1>
-              <p>This is a combined Word and Excel workspace. You can draft executive summaries, financial models, and
-                reports seamlessly in one place.</p>
-
-              <h2>Quarterly Financial Overview & Strategic Highlights</h2>
-              <p>During the previous quarter, overall recurring software license revenues experienced a steady growth
-                trajectory driven by enterprise demand.</p>
-
-              <ul>
-                <li><strong>Net Recurring ARR:</strong> Reached <strong>$151,700</strong> across primary product
-                  categories.</li>
-                <li><strong>Top Margin Performer:</strong> <em>Widget C</em> maintained the peak profit margin at
-                  <strong>61.6%</strong>.
-                </li>
-                <li><strong>Infrastructure Savings:</strong> Operational overhead was optimized by 14.2% post cloud
-                  consolidation.</li>
-              </ul>
-
-              <blockquote>"The integration of automated formula models reduced financial closing cycle times from 5 days
-                down to under 2 hours."</blockquote>
-
-              <h3>Live Spreadsheet Cross-Reference Table</h3>
-              <table id="doc-embedded-table">
-                <thead>
-                  <tr>
-                    <th>Product Line</th>
-                    <th>Sales ($)</th>
-                    <th>Cost ($)</th>
-                    <th>Profit ($)</th>
-                    <th>Margin (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Widget A</td>
-                    <td>$42,300</td>
-                    <td>$18,100</td>
-                    <td>$24,200</td>
-                    <td>57.2%</td>
-                  </tr>
-                  <tr>
-                    <td>Widget B</td>
-                    <td>$31,800</td>
-                    <td>$15,400</td>
-                    <td>$16,400</td>
-                    <td>51.6%</td>
-                  </tr>
-                  <tr>
-                    <td>Widget C</td>
-                    <td>$58,100</td>
-                    <td>$22,300</td>
-                    <td>$35,800</td>
-                    <td>61.6%</td>
-                  </tr>
-                  <tr>
-                    <td>Widget D</td>
-                    <td>$19,500</td>
-                    <td>$9,800</td>
-                    <td>$9,700</td>
-                    <td>49.7%</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <p>Feel free to click anywhere in this document to edit text, apply typography styles, or insert live
-                formula tables directly from the Excel Spreadsheet engine tab.</p>
-            </div>
-
-          </div>
-        </div>
-
       </div>
 
       <!-- ================================================================= -->
@@ -1235,8 +1033,8 @@
     function execDocCmd(command, value = null) {
       if (!quill) return;
       const currentFormat = quill.getFormat();
-      
-      switch(command) {
+
+      switch (command) {
         case 'bold': quill.format('bold', !currentFormat.bold); break;
         case 'italic': quill.format('italic', !currentFormat.italic); break;
         case 'underline': quill.format('underline', !currentFormat.underline); break;
@@ -1284,35 +1082,35 @@
       document.getElementById("sb-read-time").innerText = `~${readTime} min`;
     }
 
-        async function triggerDocAiAssist() {
+    async function triggerDocAiAssist() {
       if (!isPro) { openUpgradeModal(); return; }
-      
+
       const docText = quill ? quill.getText() : "";
       showToast("AI is analyzing document...");
-      
+
       try {
-          const res = await fetch('https://documind-ai-puce.vercel.app/api/ai-chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ prompt: "Analyze the following document and provide a short, one-sentence insight or autocomplete suggestion for the next paragraph: " + docText })
-          });
-          
-          const data = await res.json();
-          let responseText = data.reply || "No insight generated.";
-          
-          const snippet = `
+        const res = await fetch('https://documind-ai-puce.vercel.app/api/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: "Analyze the following document and provide a short, one-sentence insight or autocomplete suggestion for the next paragraph: " + docText })
+        });
+
+        const data = await res.json();
+        let responseText = data.reply || "No insight generated.";
+
+        const snippet = `
             <p class="text-purple-300 bg-aiPurple/10 border-l-2 border-aiPurple p-2.5 my-3 rounded-r text-xs font-sans">
               <strong>✦ AI Insight:</strong> ${responseText}
             </p>
           `;
-          
-          if(quill) {
-              const range = quill.getSelection(true);
-              quill.clipboard.dangerouslyPasteHTML(range.index, snippet);
-          }
-          updateDocStats();
-      } catch(e) {
-          showToast("AI Analysis failed.");
+
+        if (quill) {
+          const range = quill.getSelection(true);
+          quill.clipboard.dangerouslyPasteHTML(range.index, snippet);
+        }
+        updateDocStats();
+      } catch (e) {
+        showToast("AI Analysis failed.");
       }
     }
 
@@ -1324,7 +1122,7 @@
 
       let tbodyHtml = "";
       for (let r = 0; r < 4; r++) { // first 4 rows
-        tbodyHtml += `<tr><td>${data[r][0]}</td><td>$${data[r][1]}</td><td>$${data[r][2]}</td><td>$${data[r][3]}</td><td>${(data[r][4]*100).toFixed(1)}%</td></tr>`;
+        tbodyHtml += `<tr><td>${data[r][0]}</td><td>$${data[r][1]}</td><td>$${data[r][2]}</td><td>$${data[r][3]}</td><td>${(data[r][4] * 100).toFixed(1)}%</td></tr>`;
       }
 
       docTable.querySelector("tbody").innerHTML = tbodyHtml;
@@ -1441,116 +1239,116 @@
         </div>
         <div id="modal-msg" class="text-sm mt-2 text-red-400"></div>
       `;
-      
+
       const btn = document.getElementById("modal-confirm-btn");
       btn.innerText = "Send Code";
       btn.classList.remove("hidden");
       btn.disabled = false;
       btn.onclick = modalRequestCode;
-      
+
       container.classList.remove("hidden");
     }
 
     async function modalRequestCode() {
-        const emailInput = document.getElementById('modal-email').value;
-        const phoneInput = document.getElementById('modal-phone').value;
-        if(!emailInput || !phoneInput) return;
-        
-        const btn = document.getElementById('modal-confirm-btn');
-        const msg = document.getElementById('modal-msg');
-        
-        btn.disabled = true;
-        btn.innerText = "Sending...";
-        msg.innerText = "";
-        
-        try {
-            const res = await fetch(`https://documind-ai-puce.vercel.app/api/request-code`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: emailInput, name: 'Unknown', phone: phoneInput })
-            });
-            
-            const data = await res.json();
-            if(res.ok) {
-                modalCurrentEmail = emailInput;
-                document.getElementById('modal-step-request').classList.add("hidden");
-                document.getElementById('modal-step-verify').classList.remove("hidden");
-                btn.innerText = "Verify Code";
-                btn.disabled = false;
-                btn.onclick = modalVerifyCode;
-            } else {
-                msg.innerText = data.error || "An error occurred";
-                btn.disabled = false;
-                btn.innerText = "Send Code";
-            }
-        } catch (err) {
-            msg.innerText = "Connection error.";
-            btn.disabled = false;
-            btn.innerText = "Send Code";
+      const emailInput = document.getElementById('modal-email').value;
+      const phoneInput = document.getElementById('modal-phone').value;
+      if (!emailInput || !phoneInput) return;
+
+      const btn = document.getElementById('modal-confirm-btn');
+      const msg = document.getElementById('modal-msg');
+
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+      msg.innerText = "";
+
+      try {
+        const res = await fetch(`https://documind-ai-puce.vercel.app/api/request-code`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput, name: 'Unknown', phone: phoneInput })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          modalCurrentEmail = emailInput;
+          document.getElementById('modal-step-request').classList.add("hidden");
+          document.getElementById('modal-step-verify').classList.remove("hidden");
+          btn.innerText = "Verify Code";
+          btn.disabled = false;
+          btn.onclick = modalVerifyCode;
+        } else {
+          msg.innerText = data.error || "An error occurred";
+          btn.disabled = false;
+          btn.innerText = "Send Code";
         }
+      } catch (err) {
+        msg.innerText = "Connection error.";
+        btn.disabled = false;
+        btn.innerText = "Send Code";
+      }
     }
 
     async function modalVerifyCode() {
-        const codeInput = document.getElementById('modal-code').value;
-        if(!codeInput) return;
+      const codeInput = document.getElementById('modal-code').value;
+      if (!codeInput) return;
 
-        const btn = document.getElementById('modal-confirm-btn');
-        const msg = document.getElementById('modal-msg');
-        
-        btn.disabled = true;
-        btn.innerText = "Verifying...";
-        msg.innerText = "";
+      const btn = document.getElementById('modal-confirm-btn');
+      const msg = document.getElementById('modal-msg');
 
-        try {
-            const res = await fetch(`https://documind-ai-puce.vercel.app/api/verify-code`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: modalCurrentEmail, code: codeInput })
-            });
-            
-            const data = await res.json();
-            if(res.ok) {
-                document.getElementById('modal-step-verify').classList.add("hidden");
-                document.getElementById('modal-step-waiting').classList.remove("hidden");
-                btn.classList.add("hidden");
-                modalStartPolling();
-            } else {
-                msg.innerText = data.error || "Invalid code";
-                btn.disabled = false;
-                btn.innerText = "Verify Code";
-            }
-        } catch (err) {
-            msg.innerText = "Connection error";
-            btn.disabled = false;
-            btn.innerText = "Verify Code";
+      btn.disabled = true;
+      btn.innerText = "Verifying...";
+      msg.innerText = "";
+
+      try {
+        const res = await fetch(`https://documind-ai-puce.vercel.app/api/verify-code`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: modalCurrentEmail, code: codeInput })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('modal-step-verify').classList.add("hidden");
+          document.getElementById('modal-step-waiting').classList.remove("hidden");
+          btn.classList.add("hidden");
+          modalStartPolling();
+        } else {
+          msg.innerText = data.error || "Invalid code";
+          btn.disabled = false;
+          btn.innerText = "Verify Code";
         }
+      } catch (err) {
+        msg.innerText = "Connection error";
+        btn.disabled = false;
+        btn.innerText = "Verify Code";
+      }
     }
 
     function modalStartPolling() {
-        modalPollInterval = setInterval(async () => {
-            try {
-                const res = await fetch(`https://documind-ai-puce.vercel.app/api/status?email=${encodeURIComponent(modalCurrentEmail)}`);
-                const data = await res.json();
-                
-                if (data.status === 'approved') {
-                    clearInterval(modalPollInterval);
-                    closeModal();
-                    showToast("Access granted to AI features!");
-                    isPro = true;
-                    
-                    const proBtn = document.getElementById('sidebar-pro-btn');
-                    if (proBtn) {
-                        proBtn.classList.remove('from-amber-500', 'to-amber-600', 'hover:from-amber-600', 'hover:to-amber-700', 'text-slate-950');
-                        proBtn.classList.add('bg-aiPurple/20', 'text-purple-300', 'border', 'border-aiPurple/40', 'cursor-default');
-                        proBtn.onclick = null;
-                        document.getElementById('sidebar-pro-text').innerText = "Pro";
-                        document.getElementById('sidebar-pro-icon').classList.add('hidden');
-                    }
-                }
-            } catch (err) {
-                console.error("Polling error", err);
+      modalPollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`https://documind-ai-puce.vercel.app/api/status?email=${encodeURIComponent(modalCurrentEmail)}`);
+          const data = await res.json();
+
+          if (data.status === 'approved') {
+            clearInterval(modalPollInterval);
+            closeModal();
+            showToast("Access granted to AI features!");
+            isPro = true;
+
+            const proBtn = document.getElementById('sidebar-pro-btn');
+            if (proBtn) {
+              proBtn.classList.remove('from-amber-500', 'to-amber-600', 'hover:from-amber-600', 'hover:to-amber-700', 'text-slate-950');
+              proBtn.classList.add('bg-aiPurple/20', 'text-purple-300', 'border', 'border-aiPurple/40', 'cursor-default');
+              proBtn.onclick = null;
+              document.getElementById('sidebar-pro-text').innerText = "Pro";
+              document.getElementById('sidebar-pro-icon').classList.add('hidden');
             }
-        }, 3000);
+          }
+        } catch (err) {
+          console.error("Polling error", err);
+        }
+      }, 3000);
     }
 
     function showToast(message) {
@@ -1625,7 +1423,7 @@
       input.value = "";
     }
 
-        async function sendAiMessage() {
+    async function sendAiMessage() {
       const input = document.getElementById("ai-chat-input");
       const text = input.value.trim();
       if (!text) return;
@@ -1642,7 +1440,7 @@
       `;
 
       input.value = "";
-      
+
       const loadingId = 'loading-' + Date.now();
       stream.innerHTML += `
           <div id="${loadingId}" class="flex gap-2">
@@ -1655,18 +1453,18 @@
       stream.scrollTop = stream.scrollHeight;
 
       try {
-          const res = await fetch('https://documind-ai-puce.vercel.app/api/ai-chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ prompt: text })
-          });
-          
-          const data = await res.json();
-          document.getElementById(loadingId).remove();
-          
-          let responseText = data.reply || data.error || "Sorry, I couldn't process that.";
-          
-          stream.innerHTML += `
+        const res = await fetch('https://documind-ai-puce.vercel.app/api/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: text })
+        });
+
+        const data = await res.json();
+        document.getElementById(loadingId).remove();
+
+        let responseText = data.reply || data.error || "Sorry, I couldn't process that.";
+
+        stream.innerHTML += `
             <div class="flex gap-2">
               <div class="w-6 h-6 rounded-md bg-aiPurple/20 text-purple-300 flex items-center justify-center font-bold text-[10px] shrink-0">AI</div>
               <div class="bg-aiPurple/10 border border-aiPurple/20 p-2.5 rounded-xl text-purple-100 leading-relaxed max-w-[85%] text-xs whitespace-pre-wrap">
@@ -1675,8 +1473,8 @@
             </div>
           `;
       } catch (e) {
-          document.getElementById(loadingId).remove();
-          stream.innerHTML += `
+        document.getElementById(loadingId).remove();
+        stream.innerHTML += `
             <div class="flex gap-2">
               <div class="w-6 h-6 rounded-md bg-aiPurple/20 text-purple-300 flex items-center justify-center font-bold text-[10px] shrink-0">AI</div>
               <div class="bg-aiPurple/10 border border-red-500/50 p-2.5 rounded-xl text-red-300 leading-relaxed max-w-[85%] text-xs">
@@ -1731,23 +1529,23 @@
     let quill;
     let spreadsheet;
     var initialData = [
-        ["Widget A", 45000, 12000, "=B1-C1", "=D1/B1"],
-        ["Widget B", 28500, 15000, "=B2-C2", "=D2/B2"],
-        ["Widget C", 92000, 35300, "=B3-C3", "=D3/B3"],
-        ["Widget D", 15400, 9100, "=B4-C4", "=D4/B4"],
-        ["", "", "", "", ""],
-        ["TOTAL", "=SUM(B1:B5)", "=SUM(C1:C5)", "=SUM(D1:D5)", "=AVERAGE(E1:E5)"]
+      ["Widget A", 45000, 12000, "=B1-C1", "=D1/B1"],
+      ["Widget B", 28500, 15000, "=B2-C2", "=D2/B2"],
+      ["Widget C", 92000, 35300, "=B3-C3", "=D3/B3"],
+      ["Widget D", 15400, 9100, "=B4-C4", "=D4/B4"],
+      ["", "", "", "", ""],
+      ["TOTAL", "=SUM(B1:B5)", "=SUM(C1:C5)", "=SUM(D1:D5)", "=AVERAGE(E1:E5)"]
     ];
-    
+
 
 
     window.onload = function () {
       quill = new Quill('#doc-editor', {
-          theme: 'snow',
-          modules: { toolbar: false }
+        theme: 'snow',
+        modules: { toolbar: false }
       });
       quill.on('text-change', updateDocStats);
-      
+
 
 
       updateDocStats();
