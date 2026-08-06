@@ -1584,44 +1584,12 @@
         panelDoc.classList.add("hidden");
         panelSheet.classList.remove("hidden");
         navSheet.className = "w-full px-3 py-2 rounded-lg bg-excelGreen text-white text-xs font-medium flex items-center gap-2 transition-all shadow-sm";
-        if (!spreadsheet) {
-            spreadsheet = jspreadsheet(document.getElementById('jspreadsheet-container'), {
-                data: initialData,
-                columns: [
-                    { type: 'text', title: 'Product', width: '150px' },
-                    { type: 'numeric', title: 'Q3 Sales', width: '120px', mask: '$ #,##0.00' },
-                    { type: 'numeric', title: 'Op Costs', width: '120px', mask: '$ #,##0.00' },
-                    { type: 'numeric', title: 'Net Profit', width: '120px', mask: '$ #,##0.00' },
-                    { type: 'numeric', title: 'Margin', width: '100px', mask: '0.00%' }
-                ],
-                minDimensions: [15, 20],
-                defaultColWidth: 100,
-                rowResize: true,
-                columnDrag: true,
-                contextMenu: true,
-            });
-        }
+
       } else if (mode === 'split') {
         panelDoc.classList.remove("hidden");
         panelSheet.classList.remove("hidden");
         navSplit.className = "w-full px-3 py-2 rounded-lg bg-aiPurple text-white text-xs font-medium flex items-center gap-2 transition-all shadow-sm";
-        if (!spreadsheet) {
-            spreadsheet = jspreadsheet(document.getElementById('jspreadsheet-container'), {
-                data: initialData,
-                columns: [
-                    { type: 'text', title: 'Product', width: '150px' },
-                    { type: 'numeric', title: 'Q3 Sales', width: '120px', mask: '$ #,##0.00' },
-                    { type: 'numeric', title: 'Op Costs', width: '120px', mask: '$ #,##0.00' },
-                    { type: 'numeric', title: 'Net Profit', width: '120px', mask: '$ #,##0.00' },
-                    { type: 'numeric', title: 'Margin', width: '100px', mask: '0.00%' }
-                ],
-                minDimensions: [15, 20],
-                defaultColWidth: 100,
-                rowResize: true,
-                columnDrag: true,
-                contextMenu: true,
-            });
-        }
+
       }
     }
 

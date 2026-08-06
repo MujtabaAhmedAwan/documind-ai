@@ -233,15 +233,37 @@ table#grid td,table#grid th{border:1px solid #d0d0d0;padding:0;white-space:nowra
 // ═══════════════════════════════════════════════════════════
 const ROWS = 100, COLS = 26;
 const COL_W = 80, ROW_H = 22, RH_W = 46, CH_H = 20;
-let colWidths  = Array(COLS + 1).fill(COL_W);   // 1-indexed
-let rowHeights = Array(ROWS + 1).fill(ROW_H);
+let colWidths;
+let rowHeights;
 
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
 // cells[r][c] = { v: rawValue|formula, fmt:{bold,italic,underline,align,bg,color,fontSize}, merged:false }
-let cells = [];
-let undoStack = [], redoStack = [];
+let cells;
+let undoStack, redoStack;
+
+function createSheetData() {
+  const cWidths = Array(COLS + 1).fill(COL_W);
+  const rHeights = Array(ROWS + 1).fill(ROW_H);
+  const cls = [];
+  for(let r=0;r<=ROWS;r++){cls[r]=[];for(let c=0;c<=COLS;c++) cls[r][c]={v:'',fmt:{}};}
+  return { cells: cls, colWidths: cWidths, rowHeights: rHeights, undoStack: [], redoStack: [] };
+}
+
+let sheets = [createSheetData(), createSheetData(), createSheetData()];
+let currentSheetIdx = 0;
+
+function applySheetState(idx) {
+  currentSheetIdx = idx;
+  const s = sheets[idx];
+  cells = s.cells;
+  colWidths = s.colWidths;
+  rowHeights = s.rowHeights;
+  undoStack = s.undoStack;
+  redoStack = s.redoStack;
+}
+applySheetState(0);
 
 // selection
 let selR1=1,selC1=1,selR2=1,selC2=1;  // range (R1,C1):(R2,C2)
@@ -255,8 +277,6 @@ let copyR1=0,copyC1=0,copyR2=0,copyC2=0;
 
 // freeze
 let freezeRow=0, freezeCol=0;
-
-for(let r=0;r<=ROWS;r++){cells[r]=[];for(let c=0;c<=COLS;c++) cells[r][c]={v:'',fmt:{}};}
 
 // ═══════════════════════════════════════════════════════════
 //  HELPERS
@@ -960,10 +980,13 @@ document.addEventListener('mouseup',e=>{
 // ═══════════════════════════════════════════════════════════
 //  SHEET TABS
 // ═══════════════════════════════════════════════════════════
-document.querySelectorAll('.stab').forEach(tab=>{
+document.querySelectorAll('.stab').forEach((tab, idx)=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
+    applySheetState(idx);
+    document.getElementById('grid').innerHTML = ''; // force full redraw
+    renderAll();
   });
 });
 
