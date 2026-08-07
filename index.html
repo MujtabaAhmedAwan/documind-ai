@@ -447,6 +447,11 @@
   <header class="h-14 bg-surface border-b border-borderDark flex items-center justify-between px-4 shrink-0 z-50 gap-3">
     <!-- Left Logo & Branding -->
     <div class="flex items-center gap-3 shrink-0">
+      <button onclick="toggleMainSidebar()" class="md:hidden p-1.5 rounded-md hover:bg-surface2 text-slate-300 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
       <div class="flex items-center gap-2">
         <div
           class="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary via-aiPurple to-accent flex items-center justify-center font-mono font-bold text-black text-sm shadow-md">
@@ -511,8 +516,8 @@
   <div class="flex-1 flex overflow-hidden relative">
 
     <!-- LEFT NAVIGATION SIDEBAR -->
-    <aside
-      class="w-48 md:w-56 bg-surface border-r border-borderDark flex flex-col justify-between shrink-0 select-none p-3">
+    <aside id="main-sidebar"
+      class="absolute md:relative z-40 h-full w-48 md:w-56 bg-surface border-r border-borderDark flex flex-col justify-between shrink-0 select-none p-3 transition-transform duration-300 -translate-x-full md:translate-x-0">
       <div class="space-y-4">
         <!-- Navigation Tabs -->
         <div class="space-y-1">
@@ -608,7 +613,7 @@
     <!-- PANEL 3: AI COPILOT SIDEBAR                                       -->
     <!-- ================================================================= -->
     <div id="sidebar-ai"
-      class="w-80 bg-surface border-l border-borderDark flex flex-col transition-all duration-300 shrink-0 hidden">
+      class="absolute right-0 sm:relative z-50 h-full w-full sm:w-80 bg-surface border-l border-borderDark flex flex-col transition-all duration-300 shrink-0 hidden">
 
       <!-- AI Sidebar Header -->
       <div class="p-3 border-b border-borderDark flex items-center justify-between bg-surface2">
@@ -1400,6 +1405,15 @@
       if (!isPro) { openUpgradeModal(); return; }
       const sidebar = document.getElementById("sidebar-ai");
       sidebar.classList.toggle("hidden");
+    }
+
+    function toggleMainSidebar() {
+      const sidebar = document.getElementById('main-sidebar');
+      if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+      }
     }
 
     function handleGlobalSearch(query) {

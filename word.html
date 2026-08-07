@@ -235,6 +235,17 @@ body.focus-mode #title-bar,body.focus-mode #ribbon-tabs,body.focus-mode #ribbon,
 body.focus-mode #main-area{height:100vh;}
 body.focus-mode #page-scroll-area{padding:40px;}
 
+/* ── RESPONSIVE DESIGN ── */
+@media (max-width: 850px) {
+  .page { width: 100%; min-width: unset; min-height: unset; box-shadow: none; margin: 0; }
+  .page-header, .page-footer { padding: 4px 20px; }
+  .page-content { padding: 20px; min-height: 400px; }
+  .win-btns, .autosave-area, .global-search { display: none !important; }
+  .tb-center { justify-content: flex-start; }
+  #page-scroll-area { padding: 10px; }
+  .styles-row { max-width: 150px; }
+}
+
 </style>
 </head>
 <body>
